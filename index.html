@@ -34,22 +34,17 @@ button.small{padding:8px 10px;border-radius:6px;border:none;}
 button.danger{background:var(--danger);color:#fff;}
 button.muted{background:#777;color:#fff;}
 .hidden{display:none;}
-.registro-item{display:flex;gap:12px;align-items:flex-start;background:#f9f9f9;border-radius:12px;padding:12px;color:#111;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-.registro-fotos{display:flex;gap:8px;flex-shrink:0;}
-.registro-fotos img{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;}
-.registro-content{flex:1;display:flex;flex-direction:column;}
-.registro-content small{color:var(--muted);}
+.result-msg{margin-top:10px;font-weight:bold;color:var(--primary);}
 footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
-.assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
-.assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
-canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;}
-.assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
-.assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
-video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
-.result-msg{margin-top:10px;font-weight:bold;}
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;}
+.login-card{background:var(--card);color:var(--text-dark);padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.3);width:90%;max-width:320px;text-align:center;}
+.login-card h3{margin-bottom:10px;}
+.login-card input{margin-top:10px;}
+.login-card button{margin-top:14px;background:var(--active);color:#000;font-weight:bold;}
 </style>
 </head>
 <body>
+
 <div class="topbar">
   <button id="tabEnviarBtn" class="btn-top">💬 Enviar WhatsApp</button>
   <button id="tabRegistroBtn" class="tab-link">📸 Registros</button>
@@ -97,24 +92,25 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   </div>
 </div>
 
-<!-- Modal Assinatura -->
-<div id="assinaturaModal" class="assinatura-fullscreen">
-  <div class="assinatura-canvas-container">
-    <canvas id="assinaturaCanvasFull"></canvas>
-  </div>
-  <div class="assinatura-buttons">
-    <button id="assinaturaClear" class="danger">🧹 Limpar</button>
-    <button id="assinaturaClose" class="muted">❌ Fechar</button>
+<!-- Login -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-card">
+    <h3>🔒 Acesso Restrito</h3>
+    <p>Informe usuário e senha</p>
+    <input type="text" id="loginUser" placeholder="Usuário">
+    <input type="password" id="loginPass" placeholder="Senha">
+    <button id="btnLogin">Entrar</button>
+    <p style="font-size:13px;color:gray;margin-top:8px;">Usuário: admin<br>Senha: Ckl253115@?</p>
   </div>
 </div>
 
 <footer>Condomínio Cozumel 🌴</footer>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoY_0b062upsZ_ohS-_oY3TL66qd4gWc_rXLIiWdS8Qzmk3ydhSqe_XkCgI1J5DTMC/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz22-97WLHTcoLkkAD7XQVTJ14v05wO9-fyrXV2PIH-_NMe5j_Z3xCoR02AVtzOtDc3/exec";
 let contatos = [];
 
-// === Carregar contatos do Sheets ===
+// === Carregar contatos ===
 async function carregarContatos(){
   try {
     const res = await fetch(SCRIPT_URL + "?action=getContatos");
@@ -131,11 +127,7 @@ document.getElementById("btnAddMorador").onclick = async () => {
   const nome = document.getElementById("novoNome").value.trim();
   const apto = document.getElementById("novoApto").value.trim();
   const telefone = document.getElementById("novoTel").value.trim();
-
-  if (!nome || !telefone) {
-    alert("Preencha nome e telefone!");
-    return;
-  }
+  if (!nome || !telefone) return alert("Preencha nome e telefone!");
 
   const novo = { name: nome, apto: apto, phone: telefone };
   try {
@@ -151,16 +143,14 @@ document.getElementById("btnAddMorador").onclick = async () => {
       document.getElementById("novoApto").value = "";
       document.getElementById("novoTel").value = "";
       carregarContatos();
-    } else {
-      alert("❌ Erro ao salvar.");
-    }
+    } else alert("❌ Erro ao salvar.");
   } catch (err) {
     console.error(err);
     alert("Erro ao enviar dados.");
   }
 };
 
-// === Montar Select ===
+// === Montar lista de contatos ===
 function rebuildSelect() {
   const sel = document.getElementById("contato");
   sel.innerHTML = '<option value="">-- Selecione --</option>';
@@ -169,7 +159,7 @@ function rebuildSelect() {
   });
 }
 
-// === Filtrar Contatos ===
+// === Filtrar ===
 function filtrarContatos(){
   const f = document.getElementById("pesquisa").value.toLowerCase();
   const sel = document.getElementById("contato");
@@ -193,14 +183,68 @@ document.getElementById("btnEnviarWhatsApp").onclick = () => {
   window.open(`https://wa.me/55${numero}?text=${encoded}`,"_blank");
 };
 
-// === Tabs ===
+// === Salvar Registro ===
+document.getElementById("btnSalvarRegistro").onclick = async () => {
+  const sel = document.getElementById("contato");
+  const numero = sel.value.trim();
+  if (!numero) return alert("Selecione um morador.");
+
+  const nome = sel.options[sel.selectedIndex].text;
+  const empresa = document.getElementById("registroEmpresa").value.trim() || "(não informado)";
+  const obs = document.getElementById("registroObs").value.trim() || "(sem observação)";
+  const dataHora = new Date().toLocaleString("pt-BR");
+
+  const registro = { contato: nome, empresa, obs, dataHora };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "addRegistro", registro })
+    });
+    const data = await res.json();
+    if (data.result === "success") {
+      document.getElementById("msgResultado").textContent = "✅ Registro salvo com sucesso!";
+      document.getElementById("registroEmpresa").value = "";
+      document.getElementById("registroObs").value = "";
+    } else {
+      document.getElementById("msgResultado").textContent = "❌ Erro ao salvar registro.";
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao enviar dados.");
+  }
+};
+
+// === Troca de abas ===
 function aba(id){
   ["abaEnviar","abaRegistro","abaAdmin"].forEach(x=>document.getElementById(x).classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 document.getElementById("tabEnviarBtn").onclick = ()=>aba("abaEnviar");
 document.getElementById("tabRegistroBtn").onclick = ()=>aba("abaRegistro");
-document.getElementById("tabAdminBtn").onclick = ()=>aba("abaAdmin");
+document.getElementById("tabAdminBtn").onclick = ()=>verificarLogin();
+
+// === Login simples ===
+function verificarLogin(){
+  const logado = localStorage.getItem("logado") === "true";
+  if(!logado){
+    document.getElementById("loginOverlay").style.display = "flex";
+  } else {
+    aba("abaAdmin");
+  }
+}
+document.getElementById("btnLogin").onclick = ()=>{
+  const user = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+  if(user === "admin" && pass === "Ckl253115@?"){
+    localStorage.setItem("logado","true");
+    document.getElementById("loginOverlay").style.display = "none";
+    aba("abaAdmin");
+  } else {
+    alert("Usuário ou senha incorretos!");
+  }
+};
 
 // === Inicialização ===
 carregarContatos();
