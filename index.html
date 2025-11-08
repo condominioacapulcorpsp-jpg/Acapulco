@@ -191,13 +191,6 @@ function rebuildSelect() {
     contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
     rebuildSelect();
   });
-
-  function rebuildSelect() {
-    const sel = document.getElementById('contato');
-    sel.innerHTML = '<option value="">-- Selecione --</option>';
-    contatos.forEach(c => {
-      sel.innerHTML += `<option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>`;
-    });
   }
 </script>
 
@@ -290,4 +283,5 @@ function aba(id){
 
 </body>
 </html>
+
 
