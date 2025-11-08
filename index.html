@@ -141,7 +141,53 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   let registros = [];
 
   onValue(ref(db, "contatos"), snapshot => {
-    const data = snapshot.val() || {};
+  const data = snapshot.val() || {};
+  contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
+  rebuildSelect();
+});
+
+// ======= Adicionar Morador =======
+document.getElementById('btnAddMorador').onclick = () => {
+  const nome = document.getElementById('novoNome').value.trim();
+  const apto = document.getElementById('novoApto').value.trim();
+  const telefone = document.getElementById('novoTel').value.trim();
+
+  if (!nome || !telefone) {
+    alert("Preencha pelo menos o nome e o telefone!");
+    return;
+  }
+
+  const novo = {
+    name: nome,
+    apto: apto || '',
+    phone: telefone,
+    data: new Date().toISOString()
+  };
+
+  import("https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js").then(({ getDatabase, ref, push }) => {
+    const db = getDatabase();
+    push(ref(db, "contatos"), novo)
+      .then(() => {
+        alert("✅ Contato adicionado com sucesso!");
+        document.getElementById('novoNome').value = '';
+        document.getElementById('novoApto').value = '';
+        document.getElementById('novoTel').value = '';
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Erro ao salvar no Firebase.");
+      });
+  });
+};
+
+function rebuildSelect() {
+  const sel = document.getElementById('contato');
+  sel.innerHTML = '<option value="">-- Selecione --</option>';
+  contatos.forEach(c => {
+    sel.innerHTML += `<option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>`;
+  });
+}
+   const data = snapshot.val() || {};
     contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
     rebuildSelect();
   });
@@ -244,3 +290,4 @@ function aba(id){
 
 </body>
 </html>
+
