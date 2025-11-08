@@ -118,9 +118,10 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 </div>
 
 <footer>Condomínio Cozumel 🌴</footer>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getDatabase, ref, push, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
@@ -138,57 +139,43 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0iDSfqz3BlYST-3VRXrcEBpffPMhXXhhItT1--KxIVEYgK-fC9LDVo7gxufRpaZzf/exec";
   let contatos = [];
   let registros = [];
-  let registroIndexAssinatura = null;
-  let cameraStream = null, cameraCapturedFile = null;
-  const SENHA_EXCLUIR = '12345';
 
-  // Carregar contatos
   onValue(ref(db, "contatos"), snapshot => {
     const data = snapshot.val() || {};
     contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
     rebuildSelect();
-    renderAdminTable();
   });
-
-  // Carregar registros
-  onValue(ref(db, "registros"), snapshot => {
-    const data = snapshot.val() || {};
-    registros = Object.values(data).sort((a,b)=>new Date(b.data)-new Date(a.data));
-    renderRegistros();
-  });
-
-  function persist() {} // desativado
 
   function rebuildSelect() {
     const sel = document.getElementById('contato');
     sel.innerHTML = '<option value="">-- Selecione --</option>';
     contatos.forEach(c => {
-      sel.innerHTML += <option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>;
+      sel.innerHTML += `<option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>`;
     });
   }
-
-  // Continuação na Parte 4...
 </script>
+
 <script>
 // ======= Renderizar Registros =======
 function renderRegistros() {
   const lista = document.getElementById('listaRegistros');
   lista.innerHTML = "";
-  registros.forEach((r,i)=>{
+  if(!window.registros) return;
+  window.registros.forEach((r,i)=>{
     lista.innerHTML += `
       <div class="registro-item">
         <div class="registro-fotos">
-          ${r.foto ? <img src="${r.foto}"> : <div style="width:100px;height:100px;background:#ccc;border-radius:8px"></div>}
-          ${r.assinatura ? <img src="${r.assinatura}"> : ''}
+          ${r.foto ? `<img src="${r.foto}">` : `<div style="width:100px;height:100px;background:#ccc;border-radius:8px"></div>`}
+          ${r.assinatura ? `<img src="${r.assinatura}">` : ''}
         </div>
         <div class="registro-content">
           <strong>${r.nome} - Apt: ${r.apto}</strong><br>
           ${r.empresa || ''}<br>
           ${r.obs || ''}<br>
           <small>Registro: ${r.data}</small><br>
-          ${r.dataBaixa ? <small>Baixa: ${r.dataBaixa}</small><br> : ''}
-          ${r.assinatura ? ✅ Entrega Confirmada : <button class="small primary" onclick="darBaixa(${i})">✍ Dar Baixa</button>}
-          ${r.linkAssinatura ? <div style="margin-top:6px"><a href="${r.linkAssinatura}" target="_blank">🔗 Link de assinatura</a></div> : ''}
+          ${r.dataBaixa ? `<small>Baixa: ${r.dataBaixa}</small><br>` : ''}
+          ${r.assinatura ? '✅ Entrega Confirmada' : `<button class="small primary" onclick="darBaixa(${i})">✍ Dar Baixa</button>`}
+          ${r.linkAssinatura ? `<div style="margin-top:6px"><a href="${r.linkAssinatura}" target="_blank">🔗 Link de assinatura</a></div>` : ''}
         </div>
         <button class="small danger" onclick="excluir(${i})">🗑</button>
       </div>`;
@@ -197,7 +184,6 @@ function renderRegistros() {
 
 // ======= Dar Baixa =======
 window.darBaixa = (i) => {
-  registroIndexAssinatura = i;
   document.getElementById('assinaturaModal').style.display = "flex";
   initCanvas();
 };
@@ -227,31 +213,6 @@ function filtrarContatos(){
   });
 }
 
-// ======= Câmera =======
-const video = document.getElementById('cameraVideo');
-const canvasCamera = document.getElementById('cameraCanvas');
-document.getElementById('btnStartCamera').onclick = async () => {
-  if(cameraStream){ cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-  video.classList.remove('hidden'); document.getElementById('btnCapturePhoto').classList.remove('hidden');
-  cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-  video.srcObject = cameraStream;
-};
-document.getElementById('btnCapturePhoto').onclick = () => {
-  canvasCamera.width = video.videoWidth;
-  canvasCamera.height = video.videoHeight;
-  canvasCamera.getContext('2d').drawImage(video, 0, 0);
-  canvasCamera.classList.remove('hidden'); video.classList.add('hidden');
-  cameraCapturedFile = dataURLtoFile(canvasCamera.toDataURL('image/png'), 'camera.png');
-  cameraStream.getTracks().forEach(t => t.stop());
-  cameraStream = null;
-  document.getElementById('btnCapturePhoto').classList.add('hidden');
-};
-function dataURLtoFile(dataurl, filename){
-  let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-  while(n--){ u8arr[n] = bstr.charCodeAt(n); }
-  return new File([u8arr], filename, { type: mime });
-}
-
 // ======= WhatsApp =======
 document.getElementById('btnEnviarWhatsApp').onclick = () => {
   const sel = document.getElementById('contato');
@@ -262,15 +223,11 @@ document.getElementById('btnEnviarWhatsApp').onclick = () => {
   const obs = document.getElementById('registroObs').value || '(sem observação)';
   const dataHora = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
-  const ultimo = registros.find(r => r && r.id) || registros[0];
-  const id = ultimo?.id;
-  if(!id) return alert("Salve o registro antes de enviar o WhatsApp.");
-
-  const linkAssinatura = ultimo.linkAssinatura || ${SCRIPT_URL}?id=${id};
-  const mensagem = 📦 *Condomínio Cozumel* 🌴\n\nOlá, ${nome}!\nSua entrega chegou em ${dataHora}.\n📍 Empresa: ${empresa}\n📝 Observação: ${obs}\n\nPor favor, assine o recebimento aqui:\n${linkAssinatura};
+  const linkAssinatura = `https://script.google.com/macros/s/AKfycbz0iDSfqz3BlYST-3VRXrcEBpffPMhXXhhItT1--KxIVEYgK-fC9LDVo7gxufRpaZzf/exec?id=${Date.now()}`;
+  const mensagem = `📦 *Condomínio Cozumel* 🌴\n\nOlá, ${nome}!\nSua entrega chegou em ${dataHora}.\n📍 Empresa: ${empresa}\n📝 Observação: ${obs}\n\nPor favor, assine o recebimento aqui:\n${linkAssinatura}`;
   const encodedMsg = encodeURIComponent(mensagem);
-  const linkApp = whatsapp://send?phone=55${numero}&text=${encodedMsg};
-  const linkWeb = https://wa.me/55${numero}?text=${encodedMsg};
+  const linkApp = `whatsapp://send?phone=55${numero}&text=${encodedMsg}`;
+  const linkWeb = `https://wa.me/55${numero}?text=${encodedMsg}`;
   window.location.href = linkApp;
   setTimeout(() => { window.open(linkWeb, '_blank'); }, 1500);
 };
@@ -280,11 +237,10 @@ document.getElementById('tabEnviarBtn').onclick = () => { aba('abaEnviar') };
 document.getElementById('tabRegistroBtn').onclick = () => { aba('abaRegistro'); renderRegistros(); };
 document.getElementById('tabAdminBtn').onclick = () => { aba('abaAdmin') };
 function aba(id){
-  document.getElementById('abaEnviar').classList.add('hidden');
-  document.getElementById('abaRegistro').classList.add('hidden');
-  document.getElementById('abaAdmin').classList.add('hidden');
+  ['abaEnviar','abaRegistro','abaAdmin'].forEach(a=>document.getElementById(a).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 </script>
+
 </body>
 </html>
