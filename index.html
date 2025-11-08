@@ -47,6 +47,8 @@ canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:no
 .assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
 video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 .result-msg{margin-top:10px;font-weight:bold;}
+.admin-table{width:100%;margin-top:15px;border-collapse:collapse;}
+.admin-table th, .admin-table td{border-bottom:1px solid #ddd;padding:8px;text-align:left;}
 </style>
 </head>
 <body>
@@ -71,14 +73,7 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
     <label>Observação</label>
     <input id="registroObs" type="text" placeholder="Ex: 2 pacotes">
 
-    <label>Foto da entrega (ou usar câmera)</label>
-    <input id="registroFoto" type="file" accept="image/*">
-    <video id="cameraVideo" autoplay class="hidden"></video>
-    <canvas id="cameraCanvas" class="camera-canvas hidden"></canvas>
-
     <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-      <button id="btnStartCamera" class="small">📷 Usar Câmera</button>
-      <button id="btnCapturePhoto" class="small hidden">📸 Capturar</button>
       <button id="btnSalvarRegistro" class="small primary">💾 Salvar Registro</button>
       <button id="btnEnviarWhatsApp" class="small" style="background:var(--active);color:#000;">📤 Enviar WhatsApp</button>
     </div>
@@ -101,19 +96,10 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
     <label>Telefone WhatsApp</label>
     <input id="novoTel" type="tel">
     <button id="btnAddMorador" class="primary">➕ Adicionar</button>
-    <table class="admin-table" id="adminTable"><thead><tr><th>Nome</th><th>Apto</th><th>Telefone</th><th>Ações</th></tr></thead><tbody></tbody></table>
-  </div>
-</div>
-
-<!-- Modal Assinatura -->
-<div id="assinaturaModal" class="assinatura-fullscreen">
-  <div class="assinatura-canvas-container">
-    <canvas id="assinaturaCanvasFull"></canvas>
-  </div>
-  <div class="assinatura-buttons">
-    <button id="assinaturaClear" class="danger">🧹 Limpar</button>
-    <button id="assinaturaSave" class="primary">✔ Salvar</button>
-    <button id="assinaturaClose" class="muted">❌ Fechar</button>
+    <table class="admin-table" id="adminTable">
+      <thead><tr><th>Nome</th><th>Apto</th><th>Telefone</th></tr></thead>
+      <tbody></tbody>
+    </table>
   </div>
 </div>
 
@@ -121,7 +107,7 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+  import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
@@ -135,37 +121,34 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0iDSfqz3BlYST-3VRXrcEBpffPMhXXhhItT1--KxIVEYgK-fC9LDVo7gxufRpaZzf/exec";
   let contatos = [];
-  let registros = [];
 
+  // ======= Carregar contatos =======
   onValue(ref(db, "contatos"), snapshot => {
-  const data = snapshot.val() || {};
-  contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
-  rebuildSelect();
-});
+    const data = snapshot.val() || {};
+    contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
+    rebuildSelect();
+    renderAdminTable();
+  });
 
-// ======= Adicionar Morador =======
-document.getElementById('btnAddMorador').onclick = () => {
-  const nome = document.getElementById('novoNome').value.trim();
-  const apto = document.getElementById('novoApto').value.trim();
-  const telefone = document.getElementById('novoTel').value.trim();
+  // ======= Adicionar Morador =======
+  document.getElementById('btnAddMorador').onclick = () => {
+    const nome = document.getElementById('novoNome').value.trim();
+    const apto = document.getElementById('novoApto').value.trim();
+    const telefone = document.getElementById('novoTel').value.trim();
 
-  if (!nome || !telefone) {
-    alert("Preencha pelo menos o nome e o telefone!");
-    return;
-  }
+    if (!nome || !telefone) {
+      alert("Preencha pelo menos o nome e o telefone!");
+      return;
+    }
 
-  const novo = {
-    name: nome,
-    apto: apto || '',
-    phone: telefone,
-    data: new Date().toISOString()
-  };
+    const novo = {
+      name: nome,
+      apto: apto || '',
+      phone: telefone,
+      data: new Date().toISOString()
+    };
 
-  import("https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js").then(({ getDatabase, ref, push }) => {
-    const db = getDatabase();
     push(ref(db, "contatos"), novo)
       .then(() => {
         alert("✅ Contato adicionado com sucesso!");
@@ -177,71 +160,28 @@ document.getElementById('btnAddMorador').onclick = () => {
         console.error(err);
         alert("❌ Erro ao salvar no Firebase.");
       });
-  });
-};
+  };
 
-function rebuildSelect() {
-  const sel = document.getElementById('contato');
-  sel.innerHTML = '<option value="">-- Selecione --</option>';
-  contatos.forEach(c => {
-    sel.innerHTML += `<option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>`;
-  });
-}
-   const data = snapshot.val() || {};
-    contatos = Object.entries(data).map(([id, c]) => ({ ...c, id }));
-    rebuildSelect();
-  });
+  function rebuildSelect() {
+    const sel = document.getElementById('contato');
+    sel.innerHTML = '<option value="">-- Selecione --</option>';
+    contatos.forEach(c => {
+      sel.innerHTML += `<option value="${c.phone}">${c.name} - Apt: ${c.apto || ''}</option>`;
+    });
+  }
+
+  function renderAdminTable() {
+    const tbody = document.querySelector("#adminTable tbody");
+    tbody.innerHTML = "";
+    contatos.forEach(c => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.name}</td><td>${c.apto}</td><td>${c.phone}</td>`;
+      tbody.appendChild(tr);
+    });
   }
 </script>
 
 <script>
-// ======= Renderizar Registros =======
-function renderRegistros() {
-  const lista = document.getElementById('listaRegistros');
-  lista.innerHTML = "";
-  if(!window.registros) return;
-  window.registros.forEach((r,i)=>{
-    lista.innerHTML += `
-      <div class="registro-item">
-        <div class="registro-fotos">
-          ${r.foto ? `<img src="${r.foto}">` : `<div style="width:100px;height:100px;background:#ccc;border-radius:8px"></div>`}
-          ${r.assinatura ? `<img src="${r.assinatura}">` : ''}
-        </div>
-        <div class="registro-content">
-          <strong>${r.nome} - Apt: ${r.apto}</strong><br>
-          ${r.empresa || ''}<br>
-          ${r.obs || ''}<br>
-          <small>Registro: ${r.data}</small><br>
-          ${r.dataBaixa ? `<small>Baixa: ${r.dataBaixa}</small><br>` : ''}
-          ${r.assinatura ? '✅ Entrega Confirmada' : `<button class="small primary" onclick="darBaixa(${i})">✍ Dar Baixa</button>`}
-          ${r.linkAssinatura ? `<div style="margin-top:6px"><a href="${r.linkAssinatura}" target="_blank">🔗 Link de assinatura</a></div>` : ''}
-        </div>
-        <button class="small danger" onclick="excluir(${i})">🗑</button>
-      </div>`;
-  });
-}
-
-// ======= Dar Baixa =======
-window.darBaixa = (i) => {
-  document.getElementById('assinaturaModal').style.display = "flex";
-  initCanvas();
-};
-
-// ======= Assinatura =======
-const canvas = document.getElementById('assinaturaCanvasFull');
-const ctx = canvas.getContext('2d');
-function initCanvas(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 120;
-  ctx.lineWidth = 3; ctx.lineCap = "round";
-  let draw = false;
-  canvas.onpointerdown = e => { draw = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-  canvas.onpointermove = e => { if(draw){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-  canvas.onpointerup = () => draw = false;
-}
-document.getElementById('assinaturaClear').onclick = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); };
-document.getElementById('assinaturaClose').onclick = () => { document.getElementById('assinaturaModal').style.display = "none"; };
-
 // ======= Filtrar Contatos =======
 function filtrarContatos(){
   const f = document.getElementById('pesquisa').value.toLowerCase();
@@ -273,8 +213,9 @@ document.getElementById('btnEnviarWhatsApp').onclick = () => {
 
 // ======= Tabs =======
 document.getElementById('tabEnviarBtn').onclick = () => { aba('abaEnviar') };
-document.getElementById('tabRegistroBtn').onclick = () => { aba('abaRegistro'); renderRegistros(); };
+document.getElementById('tabRegistroBtn').onclick = () => { aba('abaRegistro') };
 document.getElementById('tabAdminBtn').onclick = () => { aba('abaAdmin') };
+
 function aba(id){
   ['abaEnviar','abaRegistro','abaAdmin'].forEach(a=>document.getElementById(a).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
@@ -283,5 +224,3 @@ function aba(id){
 
 </body>
 </html>
-
-
