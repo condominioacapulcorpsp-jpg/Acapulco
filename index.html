@@ -8,89 +8,50 @@
 :root{
   --bg:#2c2f48;
   --nav:#1b2038;
-  --card:#161618;
-  --muted:#9aa0a6;
-  --accent:#1fb954;
-  --danger:#e5534b;
-  --radius:12px;
-  --text:#eef2f7;
+  --active:#1fb954;
+  --card:#fff;
+  --text-dark:#111;
+  --muted:#777;
+  --danger:#d9534f;
+  --primary:#1B284F;
 }
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family:"Roboto",Arial,sans-serif;
-  background:linear-gradient(180deg,var(--bg),#070707);
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-
-/* topbar */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--nav);padding:12px 18px;color:#fff;flex-wrap:wrap;gap:8px;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+body{background:var(--bg);color:#fff;}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--nav);padding:12px 18px;color:#fff;flex-wrap:wrap;gap:8px;}
 .btn-top, .tab-link{border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;transition:0.2s;}
-.btn-top{background:var(--accent);color:#000;}
+.btn-top{background:var(--active);color:#000;}
 .tab-link{background:transparent;color:#fff;border:1px solid #fff;}
 .tab-link:hover, .btn-top:hover{opacity:0.9;}
-
-/* container */
-.container{max-width:980px;margin:20px auto;padding:16px;display:flex;gap:20px;align-items:flex-start;}
-.main{flex:1;}
-.side{width:340px;min-width:280px;}
-
-/* card */
-.card{
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-  padding:16px;border-radius:var(--radius);
-  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-}
-label{ display:block; font-size:13px; color:var(--muted); font-weight:600; margin-top:8px; }
-input, select, textarea, button{
-  width:100%; padding:10px; margin-top:8px; border-radius:10px;
-  background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.04);
-  outline:none; font-size:15px;
-}
-textarea{ min-height:90px; resize:vertical; }
-.row{ display:flex; gap:12px; }
-.row .col{ flex:1; }
-.btn{ cursor:pointer; padding:8px 12px; border-radius:10px; border:none; font-weight:700; display:inline-flex; gap:8px; align-items:center; justify-content:center; }
-.btn.primary{ background:var(--accent); color:#012; }
-.btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--text); }
-.btn.warn{ background:#f59e0b; color:#012; }
-.btn.danger{ background:var(--danger); color:#fff; }
-#listaRegistros{ display:flex; flex-direction:column; gap:12px; margin-top:12px; }
-.registro-item{ display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); border:1px solid rgba(255,255,255,0.02); }
-.registro-fotos{ display:flex; flex-direction:column; gap:8px; align-items:center; width:92px; }
-.registro-fotos img{ width:84px;height:84px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:#0e0e0f; display:block; }
-.registro-content{ flex:1; }
-.registro-actions{ display:flex; gap:8px; margin-top:8px; align-items:center; }
-.muted{ color:var(--muted); font-size:13px; }
-
-/* assinatura modal */
-#assinaturaModal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(2,6,23,0.7); z-index:9999; padding:20px; }
-#assinaturaBox{ width:100%; max-width:760px; background:var(--card); border-radius:12px; padding:16px; }
-#assinaturaCanvasFull{ width:100%; height:260px; border-radius:8px; background:#fff; display:block; }
-
-/* login */
-#loginTela{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:linear-gradient(0deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6)); z-index:9999; }
-#loginTela .card{ width:420px; max-width:95%; padding:18px; border-radius:12px; background:linear-gradient(180deg,var(--card), #141414); box-shadow:0 8px 30px rgba(0,0,0,0.6); }
-
-footer{ margin-top:24px; text-align:center; color:var(--muted); padding:18px 0; font-size:13px; }
-
-@media (max-width:980px){
-  .container{ flex-direction:column; padding:0 12px; }
-  .side{ width:100%; }
-}
+.container{max-width:700px;margin:20px auto;padding:16px;}
+.card{background:var(--card);color:var(--text-dark);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-bottom:20px;}
+label{display:block;color:var(--muted);margin-top:10px;font-weight:bold;}
+input, select, textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;font-size:15px;}
+textarea{min-height:60px}
+button{cursor:pointer;transition:0.2s;}
+button:hover{opacity:0.9;}
+button.primary{background:var(--primary);color:#fff;padding:10px 14px;border-radius:8px;border:none;font-weight:bold;}
+button.small{padding:8px 10px;border-radius:6px;border:none;}
+button.danger{background:var(--danger);color:#fff;}
+button.muted{background:#777;color:#fff;}
+.hidden{display:none;}
+.registro-item{display:flex;gap:12px;align-items:flex-start;background:#f9f9f9;border-radius:12px;padding:12px;color:#111;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.registro-fotos{display:flex;gap:8px;flex-shrink:0;}
+.registro-fotos img, .registro-fotos canvas{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;}
+.registro-content{flex:1;display:flex;flex-direction:column;}
+.registro-content small{color:var(--muted);}
+footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
+.assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
+.assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
+canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;}
+.assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
+.assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
+video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
+.result-msg{margin-top:10px;font-weight:bold;}
+.admin-table{width:100%;border-collapse:collapse;margin-top:12px;background:transparent;color:var(--text-dark);}
+.admin-table th, .admin-table td{padding:8px;border-bottom:1px solid #eee;text-align:left}
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <button id="tabEnviarBtn" class="btn-top">💬 Enviar WhatsApp</button>
   <button id="tabRegistroBtn" class="tab-link">📸 Registros</button>
@@ -99,408 +60,366 @@ footer{ margin-top:24px; text-align:center; color:var(--muted); padding:18px 0; 
 
 <div class="container">
 
-  <div class="main">
+  <!-- Enviar / Registrar -->
+  <div id="abaEnviar" class="card">
+    <h3>💬 Enviar / Registrar Entrega</h3>
+    <label>Filtrar contato</label>
+    <input id="pesquisa" type="text" placeholder="Ex: nome ou número" oninput="filtrarContatos()">
+    <label>Contato</label>
+    <select id="contato"><option value="">-- Selecione --</option></select>
 
-    <!-- mensagem resultado -->
-    <div id="msgResultado" class="card" style="display:none;"></div>
+    <label>Empresa</label>
+    <input id="registroEmpresa" type="text" placeholder="Ex: Mercado Livre">
+    <label>Observação</label>
+    <input id="registroObs" type="text" placeholder="Ex: 2 pacotes">
 
-    <!-- Form registrar entrega -->
-    <div id="abaEnviar" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div>
-          <h3 style="margin:0;color:var(--accent)"><i class="fas fa-box-open"></i> Registrar Entrega</h3>
-          <div class="muted">Preencha e salve para registrar na planilha</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button id="tabRegistroBtn2" class="btn ghost"><i class="fas fa-list"></i> Ver Registros</button>
-          <button id="tabAdminBtn2" class="btn ghost"><i class="fas fa-user-cog"></i> Admin</button>
-        </div>
-      </div>
+    <label>Foto da entrega (ou usar câmera)</label>
+    <input id="registroFoto" type="file" accept="image/*">
+    <video id="cameraVideo" autoplay class="hidden"></video>
+    <canvas id="cameraCanvas" class="camera-canvas hidden"></canvas>
 
-      <div style="margin-top:12px" class="row">
-        <div class="col">
-          <label for="contatoSelect">Morador</label>
-          <input id="pesquisa" placeholder="Pesquisar morador..." oninput="filtrarContatos()" />
-          <select id="contatoSelect" style="margin-top:8px;height:46px"><option value="">-- Selecione --</option></select>
-        </div>
-        <div class="col">
-          <label for="registroEmpresa">Empresa / Entregador</label>
-          <input id="registroEmpresa" placeholder="Ex: Correios, iFood..." />
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="row">
-        <div class="col">
-          <label for="registroObs">Observação</label>
-          <textarea id="registroObs" rows="3" placeholder="Observações da etiqueta / aviso"></textarea>
-        </div>
-        <div style="width:240px">
-          <label>Foto (opcional)</label>
-          <input id="registroFoto" type="file" accept="image/*" />
-        </div>
-      </div>
-
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-        <button id="btnSalvarRegistro" class="btn primary"><i class="fas fa-save"></i> Salvar Registro</button>
-        <button id="btnClearForm" class="btn ghost"><i class="fas fa-eraser"></i> Limpar</button>
-      </div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button id="btnStartCamera" class="small">📷 Usar Câmera</button>
+      <button id="btnCapturePhoto" class="small hidden">📸 Capturar</button>
+      <button id="btnSalvarRegistro" class="small primary">💾 Salvar Registro</button>
+      <button id="btnEnviarWhatsApp" class="small" style="background:var(--active);color:#000;">📤 Enviar WhatsApp</button>
     </div>
-
-    <!-- Lista de registros -->
-    <div id="abaRegistroCard" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;color:var(--accent)"><i class="fas fa-clipboard-list"></i> Registros</h3>
-        <div style="display:flex;gap:8px">
-          <button id="btnRefreshRegistros" class="btn ghost"><i class="fas fa-sync"></i> Atualizar</button>
-        </div>
-      </div>
-
-      <div id="listaRegistros"></div>
-    </div>
-
+    <div id="msgResultado" class="result-msg" aria-live="polite"></div>
   </div>
 
-  <aside class="side">
-    <!-- admin -->
-    <div id="abaAdmin" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;color:var(--accent)"><i class="fas fa-users-cog"></i> Admin / Moradores</h3>
-        <div class="muted">Gerencie contatos</div>
-      </div>
+  <!-- Registros -->
+  <div id="abaRegistro" class="card hidden">
+    <h3>📸 Registros de Entrega</h3>
+    <div id="listaRegistros"></div>
+  </div>
 
-      <div style="margin-top:12px">
-        <label>Nome</label>
-        <input id="novoNome" placeholder="Nome do morador" />
-        <label>Apto</label>
-        <input id="novoApto" placeholder="Ex: 101" />
-        <label>Tel (Whats)</label>
-        <input id="novoTel" placeholder="11999999999" />
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
-          <button id="btnAddMorador" class="btn primary"><i class="fas fa-user-plus"></i> Adicionar</button>
-        </div>
-      </div>
-
-      <div style="margin-top:14px">
-        <h4 class="muted" style="margin:0 0 8px 0">Lista de Moradores</h4>
-        <div style="max-height:320px;overflow:auto" class="card" id="adminListCard">
-          <table id="adminTable" style="background:transparent">
-            <thead><tr><th>Nome</th><th>Apto</th><th>Tel</th><th></th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- login (overlay) -->
-    <div id="loginTela" class="card" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(0deg, rgba(0,0,0,0.7), rgba(0,0,0,0.6));z-index:9999;">
-      <div style="width:420px;max-width:95%;padding:18px;border-radius:12px;background:linear-gradient(180deg,var(--card), #141414);box-shadow:0 8px 30px rgba(0,0,0,0.6);">
-        <h3 style="margin:0 0 6px 0;color:var(--accent)">🔒 Acesso Restrito</h3>
-        <div class="muted" style="margin-bottom:10px">Informe usuário e senha</div>
-        <input id="loginUsuario" type="text" placeholder="Usuário" />
-        <input id="loginSenha" type="password" placeholder="Senha" />
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn primary" id="btnLogin">Entrar</button>
-        </div>
-        <div id="loginMsg" class="muted" style="margin-top:10px"></div>
-        <div class="muted" style="margin-top:8px;font-size:13px">Usuário: <strong>admin</strong> · Senha: <strong>Ckl253115@?</strong></div>
-      </div>
-    </div>
-
-  </aside>
-
+  <!-- Admin -->
+  <div id="abaAdmin" class="card hidden">
+    <h3>👤 Gerenciar Contatos</h3>
+    <label>Nome</label>
+    <input id="novoNome" type="text">
+    <label>Apartamento</label>
+    <input id="novoApto" type="text">
+    <label>Telefone WhatsApp</label>
+    <input id="novoTel" type="tel">
+    <button id="btnAddMorador" class="primary">➕ Adicionar</button>
+    <table class="admin-table" id="adminTable"><thead><tr><th>Nome</th><th>Apto</th><th>Telefone</th><th>Ações</th></tr></thead><tbody></tbody></table>
+  </div>
 </div>
 
-<!-- assinatura modal -->
-<div id="assinaturaModal">
-  <div id="assinaturaBox" class="card">
-    <h3 style="margin-top:0;color:var(--accent)"><i class="fas fa-signature"></i> Assinatura</h3>
+<!-- Modal Assinatura -->
+<div id="assinaturaModal" class="assinatura-fullscreen">
+  <div class="assinatura-canvas-container">
     <canvas id="assinaturaCanvasFull"></canvas>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
-      <button id="assinaturaClear" class="btn ghost">Limpar</button>
-      <button id="assinaturaClose" class="btn ghost">Fechar</button>
-      <button id="assinaturaSave" class="btn primary">Salvar Assinatura</button>
-    </div>
+  </div>
+  <div class="assinatura-buttons">
+    <button id="assinaturaClear" class="danger">🧹 Limpar</button>
+    <button id="assinaturaSave" class="primary">✔ Salvar</button>
+    <button id="assinaturaClose" class="muted">❌ Fechar</button>
   </div>
 </div>
 
 <footer>Condomínio Cozumel 🌴</footer>
 
-<!-- SCRIPTS -->
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfv6c6t55qaNOTcdpB4A5tz-_M9tLw8nEWN4qwz9W-mA7tOw_VS-bPxI-kZVREepkIXQ/exec";
+<script type="module">
+  // FIREBASE (Firestore + Storage)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-let contatos = [];
-let registros = [];
+  // === ATUALIZE SEU FIREBASE CONFIG SE NECESSÁRIO ===
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
+    authDomain: "acapulco-5a508.firebaseapp.com",
+    projectId: "acapulco-5a508",
+    storageBucket: "acapulco-5a508.appspot.com",
+    messagingSenderId: "182598654317",
+    appId: "1:182598654317:web:2f3b796215fdf0854ce264"
+  };
 
-/* helpers de UI */
-function showMsg(text, success=true, forElId='msgResultado'){
-  const el = document.getElementById(forElId);
-  el.style.display = 'block';
-  el.style.color = success ? '#7ee6a6' : 'var(--danger)';
-  el.innerText = text;
-  setTimeout(()=> el.style.display = 'none', 3000);
-}
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
 
-/* carregar contatos do sheet */
-async function carregarContatos(){
-  try{
-    const r = await fetch(SCRIPT_URL + "?action=getContatos");
-    const data = await r.json();
-    contatos = Array.isArray(data) ? data : [];
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0iDSfqz3BlYST-3VRXrcEBpffPMhXXhhItT1--KxIVEYgK-fC9LDVo7gxufRpaZzf/exec"; // mantive seu script
+  const SENHA_EXCLUIR = '12345';
+
+  let contatos = []; // {id, name, apto, phone}
+  let registros = []; // {id, nome, apto, foto, assinatura, ...}
+  let registroIndexAssinatura = null;
+  let cameraStream = null, cameraCapturedFile = null;
+
+  // ------------------- LISTENERS (real-time Firestore) -------------------
+  // contatos collection
+  const contatosCol = collection(db, 'contatos');
+  onSnapshot(contatosCol, snapshot => {
+    const list = [];
+    snapshot.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
+    contatos = list;
     rebuildSelect();
     renderAdminTable();
-  }catch(err){
-    console.warn('erro carregarContatos',err);
-    // fallback localStorage
-    contatos = JSON.parse(localStorage.getItem('contatos_v2')||'[]');
-    rebuildSelect(); renderAdminTable();
-  }
-}
-
-/* carregar registros do sheet */
-async function carregarRegistros(){
-  try{
-    const r = await fetch(SCRIPT_URL + "?action=getRegistros");
-    const data = await r.json();
-    registros = Array.isArray(data) ? data : [];
-    renderRegistros();
-  }catch(err){
-    console.warn('erro carregarRegistros',err);
-    registros = JSON.parse(localStorage.getItem('registros_v2')||'[]');
-    renderRegistros();
-  }
-}
-
-/* rebuild select */
-function rebuildSelect(){
-  const sel = document.getElementById('contatoSelect');
-  sel.innerHTML = '<option value="">-- Selecione --</option>';
-  contatos.forEach(c=>{
-    const opt = document.createElement('option');
-    opt.value = c.phone || c.name || '';
-    opt.text = `${c.name || ''}${c.apto? ' — Apt: '+c.apto : ''}${c.phone? ' • '+c.phone : ''}`;
-    sel.appendChild(opt);
   });
-}
 
-/* render admin table */
-function renderAdminTable(){
-  const tbody = document.querySelector('#adminTable tbody');
-  tbody.innerHTML = '';
-  contatos.forEach((c,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="color:var(--text)">${c.name||''}</td><td style="color:var(--muted)">${c.apto||''}</td><td style="color:var(--muted)">${c.phone||''}</td>
-      <td style="text-align:right"><button class="btn ghost" onclick="deleteContato(${i})" title="Excluir"><i class="fas fa-trash-alt"></i></button></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-/* adicionar morador */
-document.getElementById('btnAddMorador').onclick = async function(){
-  const nome = document.getElementById('novoNome').value.trim();
-  const apto = document.getElementById('novoApto').value.trim();
-  const tel = document.getElementById('novoTel').value.trim();
-  if(!nome || !tel){ alert('Preencha nome e telefone'); return; }
-
-  const novo = { name: nome, apto: apto, phone: tel };
-  try{
-    const r = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'addContato', contato: novo })
-    });
-    const j = await r.json();
-    if(j && j.result === 'success'){
-      showMsg('✅ Contato adicionado (servidor).', true);
-      document.getElementById('novoNome').value=''; document.getElementById('novoApto').value=''; document.getElementById('novoTel').value='';
-      await carregarContatos();
-    } else {
-      throw new Error('resposta invalida');
-    }
-  }catch(err){
-    console.warn('addContato erro',err);
-    // fallback local
-    contatos.push(novo);
-    localStorage.setItem('contatos_v2', JSON.stringify(contatos));
-    rebuildSelect(); renderAdminTable();
-    showMsg('Servidor inacessível — salvo localmente.', false);
-  }
-};
-
-/* deletar contato local (e tenta no server) */
-window.deleteContato = async function(i){
-  if(!confirm('Remover esse contato?')) return;
-  const c = contatos.splice(i,1)[0];
-  localStorage.setItem('contatos_v2', JSON.stringify(contatos));
-  rebuildSelect(); renderAdminTable();
-  try{
-    await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'deleteContato', phone: c.phone })
-    });
-  }catch(e){ console.warn('delete remote falhou', e); }
-};
-
-/* filtrar contatos (rebuild mais confiável) */
-function filtrarContatos(){
-  const q = document.getElementById('pesquisa').value.toLowerCase();
-  const sel = document.getElementById('contatoSelect');
-  sel.innerHTML = '<option value="">-- Selecione --</option>';
-  contatos.filter(c => (c.name||'').toLowerCase().includes(q) || (c.apto||'').toLowerCase().includes(q) || (c.phone||'').includes(q))
-    .forEach(c=>{
-      const opt = document.createElement('option');
-      opt.value = c.phone || c.name || '';
-      opt.text = `${c.name || ''}${c.apto? ' — Apt: '+c.apto : ''}${c.phone? ' • '+c.phone : ''}`;
-      sel.appendChild(opt);
-    });
-}
-
-/* botão enviar WhatsApp (abre wa.me) */
-document.getElementById('btnEnviarWhatsApp')?.addEventListener('click', ()=>{
-  const sel = document.getElementById('contatoSelect');
-  const numero = (sel.value||'').replace(/\D/g,'');
-  if(!numero) return alert('Selecione um morador.');
-  const nome = sel.options[sel.selectedIndex].text;
-  const empresa = document.getElementById('registroEmpresa').value || "(não informado)";
-  const obs = document.getElementById('registroObs').value || "(sem observação)";
-  const dataHora = new Date().toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});
-  const mensagem = `📦 *Condomínio Cozumel*\n\nOlá, ${nome}!\nSua entrega chegou em ${dataHora}.\n📍 Empresa: ${empresa}\n📝 Observação: ${obs}`;
-  const encoded = encodeURIComponent(mensagem);
-  window.open(`https://wa.me/55${numero}?text=${encoded}`,"_blank");
-});
-
-/* salvar registro */
-document.getElementById('btnSalvarRegistro').onclick = async function(){
-  const sel = document.getElementById('contatoSelect');
-  const telefone = (sel.value||'').trim();
-  if(!telefone) return alert('Selecione um morador.');
-  const nome = sel.options[sel.selectedIndex].text;
-  const empresa = document.getElementById('registroEmpresa').value.trim() || "(não informado)";
-  const obs = document.getElementById('registroObs').value.trim() || "(sem observação)";
-  const dataHora = new Date().toLocaleString('pt-BR');
-
-  const registro = { contato: nome, empresa, obs, dataHora, telefone };
-
-  try{
-    const r = await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'addRegistro', registro })
-    });
-    const j = await r.json();
-    if(j && j.result === 'success'){
-      showMsg('✅ Registro salvo no servidor.');
-      // atualiza lista
-      await carregarRegistros();
-      // limpa campos
-      document.getElementById('registroEmpresa').value=''; document.getElementById('registroObs').value='';
-    } else {
-      throw new Error('resposta invalida');
-    }
-  }catch(err){
-    console.warn('salvarRegistro erro',err);
-    // fallback local
-    registros.unshift(registro);
-    localStorage.setItem('registros_v2', JSON.stringify(registros));
+  // registros collection ordered by data (string ISO) desc
+  const registrosQuery = query(collection(db, 'registros'), orderBy('data', 'desc'));
+  onSnapshot(registrosQuery, snapshot => {
+    const list = [];
+    snapshot.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
+    registros = list;
     renderRegistros();
-    showMsg('Servidor indisponível — salvo localmente.', false);
-  }
-};
+  });
 
-/* render registros */
-function renderRegistros(){
-  const lista = document.getElementById('listaRegistros');
-  lista.innerHTML = '';
-  if(!registros.length){ lista.innerHTML = '<div class="muted">Nenhum registro encontrado.</div>'; return; }
-  registros.forEach((r,i)=>{
-    const div = document.createElement('div'); div.className = 'registro-item';
-    div.innerHTML = `
-      <div class="registro-fotos">
-        <div style="width:84px;height:84px;background:#0e0e0f;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Sem foto</div>
-      </div>
-      <div class="registro-content">
-        <strong style="color:var(--text)">${r.contato||r.nome||'(sem nome)'}</strong>
-        <div class="muted">${r.empresa || ''} ${r.obs ? ' • ' + r.obs : ''}</div>
-        <div style="margin-top:8px" class="muted">Registro: ${r.dataHora || r.data || ''}</div>
-        <div class="registro-actions">
-          <button class="btn ghost" onclick="abrirNoWhatsApp(${i})"><i class="fab fa-whatsapp"></i> Notificar</button>
+  // ------------------- HELPERS -------------------
+  function rebuildSelect() {
+    const sel = document.getElementById('contato');
+    sel.innerHTML = '<option value="">-- Selecione --</option>';
+    contatos.forEach(c => {
+      sel.innerHTML += `<option value="${c.phone || ''}" data-id="${c.id}">${c.name} - Apt: ${c.apto || ''}</option>`;
+    });
+  }
+
+  function renderAdminTable(){
+    const tbody = document.querySelector('#adminTable tbody');
+    tbody.innerHTML = '';
+    contatos.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${c.name}</td><td>${c.apto || ''}</td><td>${c.phone || ''}</td><td>
+        <button class="small" onclick="editarContato('${c.id}')">✏️</button>
+        <button class="small danger" onclick="excluirContato('${c.id}')">🗑</button>
+      </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Upload helper (File or Blob)
+  async function uploadFile(file, path){
+    const sref = storageRef(storage, path);
+    await uploadBytes(sref, file);
+    return await getDownloadURL(sref);
+  }
+
+  // ------------------- ADICIONAR CONTATO -------------------
+  document.getElementById('btnAddMorador').addEventListener('click', async ()=>{
+    const nome = document.getElementById('novoNome').value.trim();
+    const apto = document.getElementById('novoApto').value.trim();
+    const tel = document.getElementById('novoTel').value.trim();
+    if(!nome || !tel){ alert('Preencha nome e telefone'); return; }
+    await addDoc(contatosCol, { name: nome, apto: apto, phone: tel });
+    document.getElementById('novoNome').value=''; document.getElementById('novoApto').value=''; document.getElementById('novoTel').value='';
+  });
+
+  // Excluir contato (confirma senha)
+  window.excluirContato = async (id) => {
+    const senha = prompt('Senha para excluir:');
+    if(senha !== SENHA_EXCLUIR) return alert('Senha incorreta');
+    await deleteDoc(doc(db, 'contatos', id));
+  };
+
+  // Editar contato (simples: preencher campos e excluir doc antigo ao salvar novo)
+  window.editarContato = (id) => {
+    const c = contatos.find(x=>x.id===id);
+    if(!c) return;
+    document.getElementById('novoNome').value = c.name;
+    document.getElementById('novoApto').value = c.apto || '';
+    document.getElementById('novoTel').value = c.phone || '';
+    // remove antigo após confirmar
+    if(confirm('Ao salvar, o contato atual será substituído. OK para continuar?')){
+      deleteDoc(doc(db, 'contatos', id));
+    }
+  };
+
+  // ------------------- SALVAR REGISTRO -------------------
+  document.getElementById('btnSalvarRegistro').addEventListener('click', async ()=>{
+    const sel = document.getElementById('contato');
+    const numero = sel.value.replace(/\D/g, '');
+    if(!numero) return alert('Selecione um morador.');
+    const selectedOption = sel.options[sel.selectedIndex];
+    const contatoId = selectedOption?.dataset?.id || '';
+    const nome = selectedOption?.text?.split(' - Apt:')[0] || '';
+    const empresa = document.getElementById('registroEmpresa').value || '';
+    const obs = document.getElementById('registroObs').value || '';
+    const dataISO = new Date().toISOString();
+    const dataBR = new Date().toLocaleString('pt-BR');
+
+    // criar documento inicial
+    const docRef = await addDoc(collection(db, 'registros'), {
+      nome: nome,
+      apto: contatos.find(c=>c.id===contatoId)?.apto || '',
+      phone: numero,
+      empresa: empresa,
+      obs: obs,
+      data: dataISO,
+      dataBR: dataBR,
+      foto: '',
+      assinatura: '',
+      linkAssinatura: '',
+      dataBaixa: ''
+    });
+
+    // se o usuário selecionou arquivo pelo input
+    const inputFile = document.getElementById('registroFoto');
+    if(inputFile.files && inputFile.files[0]){
+      const file = inputFile.files[0];
+      const url = await uploadFile(file, `registros/${docRef.id}/foto_${Date.now()}.png`);
+      await updateDoc(doc(db, 'registros', docRef.id), { foto: url });
+    }
+
+    // se capturou pela câmera
+    if(cameraCapturedFile){
+      const url = await uploadFile(cameraCapturedFile, `registros/${docRef.id}/foto_camera_${Date.now()}.png`);
+      await updateDoc(doc(db, 'registros', docRef.id), { foto: url });
+      cameraCapturedFile = null;
+    }
+
+    document.getElementById('msgResultado').innerText = 'Registro salvo!';
+    setTimeout(()=>{ document.getElementById('msgResultado').innerText = ''; }, 3000);
+
+    // limpar campos
+    document.getElementById('registroEmpresa').value=''; document.getElementById('registroObs').value=''; document.getElementById('registroFoto').value='';
+  });
+
+  // ------------------- RENDER REGISTROS -------------------
+  function renderRegistros(){
+    const lista = document.getElementById('listaRegistros');
+    lista.innerHTML = "";
+    registros.forEach((r,i)=>{
+      lista.innerHTML += `
+      <div class="registro-item">
+        <div class="registro-fotos">
+          ${r.foto ? `<img src="${r.foto}">` : `<div style="width:60px;height:70px;background:#ccc;border-radius:8px"></div>`}
+          ${r.assinatura ? `<img src="${r.assinatura}">` : ''}
         </div>
-      </div>
-    `;
-    lista.appendChild(div);
-  });
-}
-
-/* abrir no whatsapp por registro (busca telefone) */
-function abrirNoWhatsApp(index){
-  const r = registros[index];
-  if(!r) return;
-  // tentar extrair numero do campo telefone
-  let num = (r.telefone || '').toString().replace(/\D/g,'');
-  if(!num && r.contato){
-    // tenta parse do texto 'Nome — Apt: X • 1199999'
-    const parts = r.contato.split('•');
-    if(parts.length>1) num = parts[1].replace(/\D/g,'');
+        <div class="registro-content">
+          <strong>${r.nome} - Apt: ${r.apto}</strong><br>
+          ${r.empresa || ''}<br>
+          ${r.obs || ''}<br>
+          <small>Registro: ${r.dataBR || r.data}</small><br>
+          ${r.dataBaixa ? `<small>Baixa: ${r.dataBaixa}</small><br>` : ''}
+          ${r.assinatura ? `✅ Entrega Confirmada` : `<button class="small primary" onclick="darBaixa('${r.id}')">✍ Dar Baixa</button>`}
+          ${r.linkAssinatura ? `<div style="margin-top:6px"><a href="${r.linkAssinatura}" target="_blank">🔗 Link de assinatura</a></div>` : ''}
+        </div>
+        <button class="small danger" onclick="excluirRegistro('${r.id}')">🗑</button>
+      </div>`;
+    });
   }
-  if(!num) return alert('Telefone não disponível para esse registro.');
-  const mensagem = `📦 Olá, sua entrega (${r.empresa||''}) está registrada. Protocolo: ${r.dataHora||''}`;
-  window.open(`https://wa.me/55${num}?text=${encodeURIComponent(mensagem)}`,'_blank');
-}
 
-/* atualizar/refresh */
-document.getElementById('btnRefreshRegistros').onclick = carregarRegistros;
-document.getElementById('tabRegistroBtn').onclick = ()=>{ document.getElementById('abaEnviar').style.display='none'; document.getElementById('abaRegistroCard').style.display='block'; document.getElementById('abaAdmin').style.display='none'; carregarRegistros(); };
-document.getElementById('tabRegistroBtn2').onclick = ()=>{ document.getElementById('abaEnviar').style.display='none'; document.getElementById('abaRegistroCard').style.display='block'; document.getElementById('abaAdmin').style.display='none'; carregarRegistros(); };
-document.getElementById('tabAdminBtn').onclick = ()=>{ document.getElementById('abaEnviar').style.display='none'; document.getElementById('abaRegistroCard').style.display='none'; document.getElementById('abaAdmin').style.display='block'; carregarContatos(); };
-document.getElementById('tabAdminBtn2').onclick = ()=>{ document.getElementById('abaEnviar').style.display='none'; document.getElementById('abaRegistroCard').style.display='none'; document.getElementById('abaAdmin').style.display='block'; carregarContatos(); };
+  // ------------------- EXCLUIR REGISTRO -------------------
+  window.excluirRegistro = async (id) => {
+    const senha = prompt('Senha para excluir:');
+    if(senha !== SENHA_EXCLUIR) return alert('Senha incorreta');
+    await deleteDoc(doc(db, 'registros', id));
+  };
 
-/* limpar formulário */
-document.getElementById('btnClearForm').onclick = ()=>{ document.getElementById('registroEmpresa').value=''; document.getElementById('registroObs').value=''; document.getElementById('registroFoto').value=''; };
+  // ------------------- DAR BAIXA (ASSINATURA) -------------------
+  window.darBaixa = (registroId) => {
+    registroIndexAssinatura = registroId;
+    document.getElementById('assinaturaModal').style.display = 'flex';
+    initCanvas();
+  };
 
-/* login */
-const LOGIN_USER = "admin";
-const LOGIN_PASS = "Ckl253115@?";
-document.getElementById('btnLogin').onclick = ()=> {
-  const u = document.getElementById('loginUsuario').value.trim();
-  const s = document.getElementById('loginSenha').value.trim();
-  if(u===LOGIN_USER && s===LOGIN_PASS){
-    localStorage.setItem('logado','true');
-    document.getElementById('loginTela').style.display='none';
-    showMsg('Bem-vindo!','true');
-    // mostrar inicial
-    document.getElementById('abaEnviar').style.display='block';
-  } else {
-    document.getElementById('loginMsg').innerText = '❌ Usuário ou senha incorretos';
+  // Assinatura canvas
+  const canvas = document.getElementById('assinaturaCanvasFull');
+  const ctx = canvas.getContext('2d');
+  function initCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 120;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.lineWidth = 3; ctx.lineCap = 'round';
+    let draw = false;
+    canvas.onpointerdown = e => { draw = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+    canvas.onpointermove = e => { if(draw){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+    canvas.onpointerup = () => draw = false;
+    canvas.onpointerleave = () => draw = false;
   }
-};
+  document.getElementById('assinaturaClear').onclick = () => { ctx.clearRect(0,0,canvas.width,canvas.height); };
+  document.getElementById('assinaturaClose').onclick = () => { document.getElementById('assinaturaModal').style.display = 'none'; };
 
-/* init */
-(async function init(){
-  // inicia com a aba enviar visível
-  document.getElementById('abaEnviar').style.display='block';
-  document.getElementById('abaRegistroCard').style.display='none';
-  document.getElementById('abaAdmin').style.display='none';
-  // mostrar login se não logado
-  if(localStorage.getItem('logado') === 'true'){
-    document.getElementById('loginTela').style.display='none';
-  } else {
-    document.getElementById('loginTela').style.display='flex';
+  document.getElementById('assinaturaSave').onclick = async ()=>{
+    if(!registroIndexAssinatura) return alert('Registro inválido');
+    // pega blob da assinatura
+    canvas.toBlob(async (blob)=>{
+      if(!blob) return alert('Assinatura vazia');
+      const path = `registros/${registroIndexAssinatura}/assinatura_${Date.now()}.png`;
+      const url = await uploadFile(new File([blob], 'assinatura.png', { type: 'image/png' }), path);
+      const dataBaixaBR = new Date().toLocaleString('pt-BR');
+      // atualizar documento: assinatura, dataBaixa e linkAssinatura (opção 3=B -> mostrar link somente após dar baixa)
+      await updateDoc(doc(db, 'registros', registroIndexAssinatura), { assinatura: url, dataBaixa: dataBaixaBR, linkAssinatura: url });
+      document.getElementById('assinaturaModal').style.display = 'none';
+      alert('Assinatura salva e registro atualizado.');
+    });
+  };
+
+  // ------------------- FILTRAR CONTATOS -------------------
+  window.filtrarContatos = function(){
+    const f = document.getElementById('pesquisa').value.toLowerCase();
+    const sel = document.getElementById('contato');
+    Array.from(sel.options).forEach(o => {
+      if(!o.value) return;
+      o.style.display = o.text.toLowerCase().includes(f) ? 'block' : 'none';
+    });
+  };
+
+  // ------------------- CAMERA -------------------
+  const video = document.getElementById('cameraVideo');
+  const canvasCamera = document.getElementById('cameraCanvas');
+  document.getElementById('btnStartCamera').onclick = async () => {
+    if(cameraStream){ cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
+    video.classList.remove('hidden'); document.getElementById('btnCapturePhoto').classList.remove('hidden');
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = cameraStream;
+  };
+  document.getElementById('btnCapturePhoto').onclick = () => {
+    canvasCamera.width = video.videoWidth;
+    canvasCamera.height = video.videoHeight;
+    canvasCamera.getContext('2d').drawImage(video, 0, 0);
+    canvasCamera.classList.remove('hidden'); video.classList.add('hidden');
+    cameraCapturedFile = dataURLtoFile(canvasCamera.toDataURL('image/png'), 'camera.png');
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+    document.getElementById('btnCapturePhoto').classList.add('hidden');
+  };
+  function dataURLtoFile(dataurl, filename){
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){ u8arr[n] = bstr.charCodeAt(n); }
+    return new File([u8arr], filename, { type: mime });
   }
-  await carregarContatos();
-  // tenta carregar registros (pode estar vazio)
-  await carregarRegistros();
-})();
+
+  // ------------------- WHATSAPP -------------------
+  document.getElementById('btnEnviarWhatsApp').onclick = () => {
+    const sel = document.getElementById('contato');
+    const numero = sel.value.replace(/\D/g, '');
+    if(!numero) return alert("Selecione um morador.");
+    const nome = sel.options[sel.selectedIndex].text;
+    const empresa = document.getElementById('registroEmpresa').value || '(não informado)';
+    const obs = document.getElementById('registroObs').value || '(sem observação)';
+    const dataHora = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+    // pega último registro do mesmo telefone
+    const ultimo = registros.find(r => r && r.phone && r.phone.replace(/\D/g,'') === numero) || registros[0];
+    const id = ultimo?.id;
+    if(!id) return alert("Salve o registro antes de enviar o WhatsApp.");
+
+    const linkAssinatura = ultimo.linkAssinatura || `${SCRIPT_URL}?id=${id}`;
+    const mensagem = `📦 *Condomínio Cozumel* 🌴\n\nOlá, ${nome}!\nSua entrega chegou em ${dataHora}.\n📍 Empresa: ${empresa}\n📝 Observação: ${obs}\n\nPor favor, assine o recebimento aqui:\n${linkAssinatura}`;
+    const encodedMsg = encodeURIComponent(mensagem);
+    const linkApp = `whatsapp://send?phone=55${numero}&text=${encodedMsg}`;
+    const linkWeb = `https://wa.me/55${numero}?text=${encodedMsg}`;
+    // tenta abrir app, se não abrir, abre web
+    window.location.href = linkApp;
+    setTimeout(() => { window.open(linkWeb, '_blank'); }, 1500);
+  };
+
+  // ------------------- TABS -------------------
+  document.getElementById('tabEnviarBtn').onclick = () => { aba('abaEnviar') };
+  document.getElementById('tabRegistroBtn').onclick = () => { aba('abaRegistro'); renderRegistros(); };
+  document.getElementById('tabAdminBtn').onclick = () => { aba('abaAdmin') };
+  function aba(id){
+    document.getElementById('abaEnviar').classList.add('hidden');
+    document.getElementById('abaRegistro').classList.add('hidden');
+    document.getElementById('abaAdmin').classList.add('hidden');
+    document.getElementById(id).classList.remove('hidden');
+  }
+
 </script>
-
-<!-- Font Awesome (carrega ícones) -->
-<script src="https://kit.fontawesome.com/a2e0f1f1b9.js" crossorigin="anonymous"></script>
 </body>
 </html>
-
-
-
-
-
-
-
