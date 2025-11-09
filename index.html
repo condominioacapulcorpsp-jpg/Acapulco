@@ -46,7 +46,8 @@ button.muted{background:#777;color:#fff;}
 footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
 .assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
 .assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
-canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;}
+/* canvas vai ficar com largura/altura via JS (pixels reais), mas o CSS mantém aparência */
+canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;display:block;}
 .assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
 .assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
 video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
@@ -123,7 +124,7 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 </div>
 
 <!-- Modal Assinatura -->
-<div id="assinaturaModal" class="assinatura-fullscreen">
+<div id="assinaturaModal" class="assinatura-fullscreen" aria-hidden="true">
   <div class="assinatura-canvas-container">
     <canvas id="assinaturaCanvasFull"></canvas>
   </div>
@@ -138,12 +139,12 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 
 <!-- ====== SCRIPT PRINCIPAL (MODULE) ====== -->
 <script type="module">
-  // Firebase v9 modular
+  // ---- Firebase 9 (modular) - usando a mesma versão que você já tinha
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
   import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
   import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-  // === CONFIG - mantenha seu config
+  // === CONFIG - mantenha seu config (substitua por suas credenciais reais, se quiser)
   const firebaseConfig = {
     apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
     authDomain: "acapulco-5a508.firebaseapp.com",
@@ -327,31 +328,86 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   window.darBaixa = (registroId) => {
     registroIndexAssinatura = registroId;
     document.getElementById('assinaturaModal').style.display = 'flex';
+    document.getElementById('assinaturaModal').setAttribute('aria-hidden','false');
     initCanvas();
   };
 
-  // ------------------- ASSINATURA (CANVAS) -------------------
+  // ------------------- ASSINATURA (CANVAS) - CORREÇÃO DEFINITIVA -------------------
   const canvas = document.getElementById('assinaturaCanvasFull');
   const ctx = canvas.getContext('2d');
+
   function initCanvas(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 120;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.lineWidth = 3; ctx.lineCap = 'round';
-    let draw = false;
-    canvas.onpointerdown = e => { draw = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-    canvas.onpointermove = e => { if(draw){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-    canvas.onpointerup = () => draw = false;
-    canvas.onpointerleave = () => draw = false;
+    // Ajusta tamanho real do canvas (pixels) baseado no container exibido
+    const container = document.querySelector('.assinatura-canvas-container');
+    const rect = container.getBoundingClientRect();
+
+    // define dimensões do canvas em pixels (maior resolução para qualidade)
+    const width = Math.round(rect.width * devicePixelRatio);
+    const height = Math.round(rect.height * devicePixelRatio);
+
+    canvas.width = width;
+    canvas.height = height;
+
+    // ajustar CSS para manter aparência (o CSS já define 60% largura/altura)
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+
+    // escalas para coordenadas corretas
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+
+    let drawing = false;
+
+    function getPointerPos(e){
+      // suporta pointer events e touch/mouse
+      const r = canvas.getBoundingClientRect();
+      const clientX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0].clientX);
+      const clientY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0].clientY);
+      // converter para coordenadas no canvas levando em conta devicePixelRatio
+      const x = (clientX - r.left) * devicePixelRatio;
+      const y = (clientY - r.top) * devicePixelRatio;
+      return { x, y };
+    }
+
+    // pointer events (funciona em desktop e mobile modernos)
+    canvas.onpointerdown = (e) => {
+      drawing = true;
+      const p = getPointerPos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    };
+    canvas.onpointermove = (e) => {
+      if(!drawing) return;
+      const p = getPointerPos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      e.preventDefault();
+    };
+    canvas.onpointerup = (e) => { drawing = false; e.preventDefault(); };
+    canvas.onpointercancel = () => drawing = false;
+    canvas.onpointerleave = () => drawing = false;
   }
-  document.getElementById('assinaturaClear').onclick = () => { ctx.clearRect(0,0,canvas.width,canvas.height); };
-  document.getElementById('assinaturaClose').onclick = () => { document.getElementById('assinaturaModal').style.display = 'none'; };
+
+  document.getElementById('assinaturaClear').onclick = () => {
+    // limpa em escala correta
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  };
+  document.getElementById('assinaturaClose').onclick = () => {
+    document.getElementById('assinaturaModal').style.display = 'none';
+    document.getElementById('assinaturaModal').setAttribute('aria-hidden','true');
+  };
 
   // ------------------- SALVAR ASSINATURA e GERAR PDF -------------------
-  document.getElementById('assinaturaSave').onclick = async ()=>{
+  document.getElementById('assinaturaSave').onclick = async ()=> {
     if(!registroIndexAssinatura) return alert('Registro inválido');
 
-    canvas.toBlob(async (blob)=>{
+    // converte canvas para blob em escala correta
+    canvas.toBlob(async (blob) => {
       if(!blob) return alert('Assinatura vazia');
 
       const fileName = `assinatura_${Date.now()}.png`;
@@ -374,16 +430,17 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
         });
 
         document.getElementById('assinaturaModal').style.display = 'none';
+        document.getElementById('assinaturaModal').setAttribute('aria-hidden','true');
         alert('✅ Assinatura salva com sucesso!');
 
-        // GERAR O PDF AUTOMATICAMENTE (função abaixo)
+        // Gera PDF (opcional) — já existia no seu fluxo; mantive chamado
         gerarPDF(registroIndexAssinatura);
 
       } catch (e) {
         console.error("Erro ao salvar assinatura:", e);
         alert("❌ Erro ao salvar assinatura. Veja o console.");
       }
-    });
+    }, 'image/png');
   };
 
   // ------------------- FILTRAR CONTATOS -------------------
@@ -482,7 +539,6 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
         try {
           const blobFoto = await fetch(r.foto).then(res => res.blob());
           const bitmap = await createImageBitmap(blobFoto);
-          // desenha com addImage: precisa converter bitmap para dataURL
           const canvasTemp = document.createElement('canvas');
           canvasTemp.width = bitmap.width;
           canvasTemp.height = bitmap.height;
@@ -514,6 +570,13 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
       console.error('Erro gerarPDF:', e);
     }
   }
+
+  // ------------------- UTILIDADES (carregamento inicial) -------------------
+  // preenche selects caso contatos não usem onSnapshot imediatamente
+  (function initialLoad(){
+    // já estamos sincronizando com onSnapshot acima; se quiser forçar um rebuild agora:
+    rebuildSelect();
+  })();
 
 </script>
 </body>
