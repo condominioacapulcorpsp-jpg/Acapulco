@@ -337,17 +337,37 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   document.getElementById('assinaturaSave').onclick = async ()=>{
     if(!registroIndexAssinatura) return alert('Registro inválido');
     // pega blob da assinatura
-    canvas.toBlob(async (blob)=>{
-      if(!blob) return alert('Assinatura vazia');
-      const path = `registros/${registroIndexAssinatura}/assinatura_${Date.now()}.png`;
-      const url = await uploadFile(new File([blob], 'assinatura.png', { type: 'image/png' }), path);
-      const dataBaixaBR = new Date().toLocaleString('pt-BR');
-      // atualizar documento: assinatura, dataBaixa e linkAssinatura (opção 3=B -> mostrar link somente após dar baixa)
-      await updateDoc(doc(db, 'registros', registroIndexAssinatura), { assinatura: url, dataBaixa: dataBaixaBR, linkAssinatura: url });
-      document.getElementById('assinaturaModal').style.display = 'none';
-      alert('Assinatura salva e registro atualizado.');
+   canvas.toBlob(async (blob)=>{
+  if(!blob) return alert('Assinatura vazia');
+
+  const fileName = `assinatura_${Date.now()}.png`;
+  const storageRef = ref(storage, `registros/${registroIndexAssinatura}/${fileName}`);
+
+  try {
+    // Faz o upload
+    await uploadBytes(storageRef, blob);
+
+    // Pega a URL pública
+    const url = await getDownloadURL(storageRef);
+
+    const dataBaixaBR = new Date().toLocaleString('pt-BR');
+
+    // Atualiza o registro no Firestore
+    await updateDoc(doc(db, 'registros', registroIndexAssinatura), {
+      assinatura: url,
+      linkAssinatura: url,
+      dataBaixa: dataBaixaBR
     });
-  };
+
+    document.getElementById('assinaturaModal').style.display = 'none';
+    alert('✅ Assinatura salva com sucesso!');
+
+  } catch (e) {
+    console.error("Erro ao salvar assinatura:", e);
+    alert("❌ Erro ao salvar assinatura. Veja o console.");
+  }
+});
+
 
   // ------------------- FILTRAR CONTATOS -------------------
   window.filtrarContatos = function(){
@@ -423,3 +443,4 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 </script>
 </body>
 </html>
+
