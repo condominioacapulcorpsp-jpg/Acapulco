@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Correspondência - Condomínio Cozumel</title>
 
-<!-- jsPDF (UMD) para gerar PDF -->
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -22,14 +22,14 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
 body{background:var(--bg);color:#fff;}
 .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--nav);padding:12px 18px;color:#fff;flex-wrap:wrap;gap:8px;}
-.btn-top, .tab-link{border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;transition:0.2s;}
+.btn-top,.tab-link{border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;transition:0.2s;}
 .btn-top{background:var(--active);color:#000;}
 .tab-link{background:transparent;color:#fff;border:1px solid #fff;}
-.tab-link:hover, .btn-top:hover{opacity:0.9;}
+.tab-link:hover,.btn-top:hover{opacity:0.9;}
 .container{max-width:700px;margin:20px auto;padding:16px;}
 .card{background:var(--card);color:var(--text-dark);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-bottom:20px;}
 label{display:block;color:var(--muted);margin-top:10px;font-weight:bold;}
-input, select, textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;font-size:15px;}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;font-size:15px;}
 textarea{min-height:60px}
 button{cursor:pointer;transition:0.2s;}
 button:hover{opacity:0.9;}
@@ -40,31 +40,20 @@ button.muted{background:#777;color:#fff;}
 .hidden{display:none;}
 .registro-item{display:flex;gap:12px;align-items:flex-start;background:#f9f9f9;border-radius:12px;padding:12px;color:#111;box-shadow:0 2px 6px rgba(0,0,0,0.1);margin-bottom:10px;}
 .registro-fotos{display:flex;gap:8px;flex-shrink:0;align-items:center;}
-.registro-fotos img, .registro-fotos canvas{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;background:#fff;}
+.registro-fotos img,.registro-fotos canvas{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;background:#fff;}
 .registro-content{flex:1;display:flex;flex-direction:column;}
 .registro-content small{color:var(--muted);}
 footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
 .assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
 .assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
-/* canvas vai ficar com largura/altura via JS (pixels reais), mas o CSS mantém aparência */
-canvas#assinaturaCanvasFull{width:60%;height:60%;background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;display:block;}
+canvas#assinaturaCanvasFull{background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;display:block;max-width:90vw;max-height:70vh;width:100%;height:auto;}
 .assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
 .assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
-video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
+video,canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 .result-msg{margin-top:10px;font-weight:bold;}
 .admin-table{width:100%;border-collapse:collapse;margin-top:12px;background:transparent;color:var(--text-dark);}
-.admin-table th, .admin-table td{padding:8px;border-bottom:1px solid #eee;text-align:left}
-
-/* mini assinatura (thumb) */
-.mini-assinatura {
-  width:60px;
-  height:70px;
-  object-fit:contain;
-  border:1px solid #aaa;
-  border-radius:6px;
-  background:#fff;
-  margin-left:6px;
-}
+.admin-table th,.admin-table td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+.mini-assinatura{width:60px;height:70px;object-fit:contain;border:1px solid #aaa;border-radius:6px;background:#fff;margin-left:6px;}
 </style>
 </head>
 <body>
@@ -76,7 +65,6 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 
 <div class="container">
 
-  <!-- Enviar / Registrar -->
   <div id="abaEnviar" class="card">
     <h3>💬 Enviar / Registrar Entrega</h3>
     <label>Filtrar contato</label>
@@ -103,13 +91,11 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
     <div id="msgResultado" class="result-msg" aria-live="polite"></div>
   </div>
 
-  <!-- Registros -->
   <div id="abaRegistro" class="card hidden">
     <h3>📸 Registros de Entrega</h3>
     <div id="listaRegistros"></div>
   </div>
 
-  <!-- Admin -->
   <div id="abaAdmin" class="card hidden">
     <h3>👤 Gerenciar Contatos</h3>
     <label>Nome</label>
@@ -123,7 +109,6 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
   </div>
 </div>
 
-<!-- Modal Assinatura -->
 <div id="assinaturaModal" class="assinatura-fullscreen" aria-hidden="true">
   <div class="assinatura-canvas-container">
     <canvas id="assinaturaCanvasFull"></canvas>
@@ -137,446 +122,200 @@ video, canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 
 <footer>Condomínio Cozumel 🌴</footer>
 
-<!-- ====== SCRIPT PRINCIPAL (MODULE) ====== -->
 <script type="module">
-  // ---- Firebase 9 (modular) - usando a mesma versão que você já tinha
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-  // === CONFIG - mantenha seu config (substitua por suas credenciais reais, se quiser)
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
-    authDomain: "acapulco-5a508.firebaseapp.com",
-    projectId: "acapulco-5a508",
-    storageBucket: "acapulco-5a508.appspot.com",
-    messagingSenderId: "182598654317",
-    appId: "1:182598654317:web:2f3b796215fdf0854ce264"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
+  authDomain: "acapulco-5a508.firebaseapp.com",
+  projectId: "acapulco-5a508",
+  storageBucket: "acapulco-5a508.appspot.com",
+  messagingSenderId: "182598654317",
+  appId: "1:182598654317:web:2f3b796215fdf0854ce264"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLXNoYlENDq8AibSC308tDJHnbQqyU-0KkZDetuqa56ildHT5bp5XhFdov1vp43AMyfg/exec";
+const SENHA_EXCLUIR = '12345';
 
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0iDSfqz3BlYST-3VRXrcEBpffPMhXXhhItT1--KxIVEYgK-fC9LDVo7gxufRpaZzf/exec";
-  const SENHA_EXCLUIR = '12345';
+let contatos = [], registros = [], registroIndexAssinatura = null, cameraCapturedFile = null;
 
-  let contatos = [];
-  let registros = [];
-  let registroIndexAssinatura = null;
-  let cameraStream = null, cameraCapturedFile = null;
+// ========== FIREBASE SNAPSHOTS ==========
+onSnapshot(collection(db, 'contatos'), snap => {
+  contatos = [];
+  snap.forEach(d => contatos.push({ id:d.id, ...d.data() }));
+  rebuildSelect();
+  renderAdminTable();
+});
 
-  // helper para upload -> retorna URL
-  async function uploadFile(file, path){
-    const refStorage = sRef(storage, path);
-    await uploadBytes(refStorage, file);
-    return await getDownloadURL(refStorage);
-  }
+onSnapshot(query(collection(db,'registros'),orderBy('data','desc')), snap=>{
+  registros = [];
+  snap.forEach(d => registros.push({ id:d.id, ...d.data() }));
+  renderRegistros();
+});
 
-  // ------------------- LISTENERS (real-time Firestore) -------------------
-  const contatosCol = collection(db, 'contatos');
-  onSnapshot(contatosCol, snapshot => {
-    const list = [];
-    snapshot.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
-    contatos = list;
-    rebuildSelect();
-    renderAdminTable();
+// ========== FUNÇÕES ==========
+function rebuildSelect(){
+  const sel=document.getElementById('contato');
+  sel.innerHTML='<option value="">-- Selecione --</option>';
+  contatos.forEach(c=>sel.innerHTML+=`<option value="${c.phone}" data-id="${c.id}">${c.name} - Apt: ${c.apto}</option>`);
+}
+
+function renderAdminTable(){
+  const tb=document.querySelector('#adminTable tbody');
+  tb.innerHTML='';
+  contatos.forEach(c=>{
+    tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.apto}</td><td>${c.phone}</td>
+    <td><button class="small" onclick="editarContato('${c.id}')">✏</button>
+    <button class="small danger" onclick="excluirContato('${c.id}')">🗑</button></td></tr>`;
+  });
+}
+
+window.editarContato=async(id)=>{const c=contatos.find(x=>x.id===id);if(!c)return;
+document.getElementById('novoNome').value=c.name;
+document.getElementById('novoApto').value=c.apto;
+document.getElementById('novoTel').value=c.phone;
+if(confirm('Salvar substitui contato atual. OK?'))await deleteDoc(doc(db,'contatos',id));};
+
+window.excluirContato=async(id)=>{const s=prompt('Senha:');if(s!==SENHA_EXCLUIR)return alert('Senha incorreta');await deleteDoc(doc(db,'contatos',id));};
+
+document.getElementById('btnAddMorador').onclick=async()=>{
+  const n=document.getElementById('novoNome').value.trim();
+  const a=document.getElementById('novoApto').value.trim();
+  const t=document.getElementById('novoTel').value.trim();
+  if(!n||!t)return alert('Preencha nome e telefone');
+  await addDoc(collection(db,'contatos'),{name:n,apto:a,phone:t});
+  document.getElementById('novoNome').value='';document.getElementById('novoApto').value='';document.getElementById('novoTel').value='';
+};
+
+async function uploadFile(file,path){const r=sRef(storage,path);await uploadBytes(r,file);return await getDownloadURL(r);}
+
+document.getElementById('btnSalvarRegistro').onclick=async()=>{
+  const sel=document.getElementById('contato');
+  const numero=sel.value.replace(/\D/g,'');if(!numero)return alert('Selecione morador');
+  const id=sel.options[sel.selectedIndex].dataset.id;
+  const nome=sel.options[sel.selectedIndex].text.split(' - Apt:')[0];
+  const empresa=document.getElementById('registroEmpresa').value||'';
+  const obs=document.getElementById('registroObs').value||'';
+  const now=new Date();
+  const ref=await addDoc(collection(db,'registros'),{nome,apto:contatos.find(c=>c.id===id)?.apto||'',phone:numero,empresa,obs,data:now.toISOString(),dataBR:now.toLocaleString('pt-BR'),foto:'',assinatura:'',linkAssinatura:'',dataBaixa:''});
+  const input=document.getElementById('registroFoto');
+  if(input.files[0]){const url=await uploadFile(input.files[0],`registros/${ref.id}/foto.png`);await updateDoc(doc(db,'registros',ref.id),{foto:url});}
+  if(cameraCapturedFile){const url=await uploadFile(cameraCapturedFile,`registros/${ref.id}/foto_camera.png`);await updateDoc(doc(db,'registros',ref.id),{foto:url});cameraCapturedFile=null;}
+  document.getElementById('msgResultado').innerText='Registro salvo!';
+  setTimeout(()=>document.getElementById('msgResultado').innerText='',3000);
+  document.getElementById('registroEmpresa').value='';document.getElementById('registroObs').value='';document.getElementById('registroFoto').value='';
+};
+
+function renderRegistros(){
+  const lista=document.getElementById('listaRegistros');
+  lista.innerHTML='';
+  registros.forEach(r=>{
+    lista.innerHTML+=`<div class="registro-item">
+    <div class="registro-fotos">
+      ${r.foto?`<img src="${r.foto}">`:`<div style="width:60px;height:70px;background:#ccc;border-radius:8px"></div>`}
+      ${r.assinatura?`<img class="mini-assinatura" src="${r.assinatura}">`:`<div style="width:60px;height:70px"></div>`}
+    </div>
+    <div class="registro-content"><strong>${r.nome} - Apt: ${r.apto}</strong><br>${r.empresa||''}<br>${r.obs||''}<br>
+    <small>${r.dataBR}</small><br>${r.dataBaixa?`<small>Baixa: ${r.dataBaixa}</small><br>`:''}
+    ${r.assinatura?`✅ Entrega Confirmada`:`<button class="small primary" onclick="darBaixa('${r.id}')">✍ Dar Baixa</button>`}</div>
+    <button class="small danger" onclick="excluirRegistro('${r.id}')">🗑</button></div>`;
+  });
+}
+
+// ===== ABAS =====
+const abaEnviar=document.getElementById('abaEnviar'),abaRegistro=document.getElementById('abaRegistro'),abaAdmin=document.getElementById('abaAdmin');
+document.getElementById('tabEnviarBtn').onclick=()=>{abaEnviar.classList.remove('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.add('hidden');};
+document.getElementById('tabRegistroBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.remove('hidden');abaAdmin.classList.add('hidden');};
+document.getElementById('tabAdminBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.remove('hidden');};
+
+function filtrarContatos(){
+  const f=document.getElementById('pesquisa').value.toLowerCase();
+  Array.from(document.getElementById('contato').options).forEach(o=>{o.style.display=o.text.toLowerCase().includes(f)?'':'none';});
+}
+
+// ===== CAMERA =====
+const video=document.getElementById('cameraVideo'),canvas=document.getElementById('cameraCanvas');
+document.getElementById('btnStartCamera').onclick=async()=>{
+  const s=await navigator.mediaDevices.getUserMedia({video:true});
+  video.srcObject=s;video.classList.remove('hidden');
+  document.getElementById('btnCapturePhoto').classList.remove('hidden');
+};
+document.getElementById('btnCapturePhoto').onclick=()=>{
+  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+  canvas.toBlob(b=>{cameraCapturedFile=new File([b],'camera.png',{type:'image/png'});});
+  video.srcObject.getTracks().forEach(t=>t.stop());
+  video.classList.add('hidden');
+  document.getElementById('btnCapturePhoto').classList.add('hidden');
+};
+
+// ===== ASSINATURA =====
+const modal=document.getElementById('assinaturaModal');
+const c=document.getElementById('assinaturaCanvasFull');
+const ctx=c.getContext('2d');
+let desenhando=false;
+function resizeCanvas(){
+  c.width=c.clientWidth*2;
+  c.height=c.clientHeight*2;
+  ctx.scale(2,2);
+  ctx.lineWidth=2;
+  ctx.lineCap='round';
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+c.addEventListener('pointerdown',e=>{desenhando=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+c.addEventListener('pointermove',e=>{if(desenhando){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
+c.addEventListener('pointerup',()=>desenhando=false);
+c.addEventListener('pointerleave',()=>desenhando=false);
+
+document.getElementById('assinaturaClear').onclick=()=>ctx.clearRect(0,0,c.width,c.height);
+document.getElementById('assinaturaClose').onclick=()=>modal.style.display='none';
+
+window.darBaixa=(id)=>{
+  registroIndexAssinatura=id;
+  ctx.clearRect(0,0,c.width,c.height);
+  modal.style.display='flex';
+};
+
+document.getElementById('assinaturaSave').onclick=async()=>{
+  const assinaturaURL=c.toDataURL('image/png');
+  const regId=registroIndexAssinatura;
+  if(!regId)return;
+  const blob=await (await fetch(assinaturaURL)).blob();
+  const f=new File([blob],'assinatura.png',{type:'image/png'});
+  const url=await uploadFile(f,`registros/${regId}/assinatura.png`);
+  const now=new Date().toLocaleString('pt-BR');
+  await updateDoc(doc(db,'registros',regId),{assinatura:url,dataBaixa:now});
+
+  // Envia ao Google Sheets
+  const reg=registros.find(r=>r.id===regId);
+  fetch(SCRIPT_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({nome:reg.nome,apartamento:reg.apto,protocolo:reg.id,assinatura:assinaturaURL})
   });
 
-  const registrosQuery = query(collection(db, 'registros'), orderBy('data', 'desc'));
-  onSnapshot(registrosQuery, snapshot => {
-    const list = [];
-    snapshot.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
-    registros = list;
-    renderRegistros();
-  });
+  modal.style.display='none';
+};
 
-  // ------------------- HELPERS -------------------
-  function rebuildSelect() {
-    const sel = document.getElementById('contato');
-    sel.innerHTML = '<option value="">-- Selecione --</option>';
-    contatos.forEach(c => {
-      sel.innerHTML += `<option value="${c.phone || ''}" data-id="${c.id}">${c.name} - Apt: ${c.apto || ''}</option>`;
-    });
-  }
+// ===== WHATSAPP =====
+document.getElementById('btnEnviarWhatsApp').onclick=()=>{
+  const sel=document.getElementById('contato');
+  const numero=sel.value.replace(/\D/g,'');
+  if(!numero)return alert('Selecione morador');
+  const nome=sel.options[sel.selectedIndex].text.split(' - Apt:')[0];
+  const msg=`Olá ${nome}, chegou uma correspondência para você na portaria.`;
+  window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`,'_blank');
+};
 
-  function renderAdminTable(){
-    const tbody = document.querySelector('#adminTable tbody');
-    tbody.innerHTML = '';
-    contatos.forEach(c => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${c.name}</td><td>${c.apto || ''}</td><td>${c.phone || ''}</td><td>
-        <button class="small" onclick="editarContato('${c.id}')">✏️</button>
-        <button class="small danger" onclick="excluirContato('${c.id}')">🗑</button>
-      </td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Expor funções para o escopo global (usadas por onclick inline)
-  window.editarContato = async (id) => {
-    const c = contatos.find(x=>x.id===id);
-    if(!c) return;
-    document.getElementById('novoNome').value = c.name;
-    document.getElementById('novoApto').value = c.apto || '';
-    document.getElementById('novoTel').value = c.phone || '';
-    if(confirm('Ao salvar, o contato atual será substituído. OK para continuar?')){
-      await deleteDoc(doc(db, 'contatos', id));
-    }
-  };
-
-  window.excluirContato = async (id) => {
-    const senha = prompt('Senha para excluir:');
-    if(senha !== SENHA_EXCLUIR) return alert('Senha incorreta');
-    await deleteDoc(doc(db, 'contatos', id));
-  };
-
-  // ------------------- ADICIONAR CONTATO -------------------
-  document.getElementById('btnAddMorador').addEventListener('click', async ()=>{
-    const nome = document.getElementById('novoNome').value.trim();
-    const apto = document.getElementById('novoApto').value.trim();
-    const tel = document.getElementById('novoTel').value.trim();
-    if(!nome || !tel){ alert('Preencha nome e telefone'); return; }
-    await addDoc(contatosCol, { name: nome, apto: apto, phone: tel });
-    document.getElementById('novoNome').value=''; document.getElementById('novoApto').value=''; document.getElementById('novoTel').value='';
-  });
-
-  // ------------------- SALVAR REGISTRO -------------------
-  document.getElementById('btnSalvarRegistro').addEventListener('click', async ()=>{
-    const sel = document.getElementById('contato');
-    const numero = sel.value.replace(/\D/g, '');
-    if(!numero) return alert('Selecione um morador.');
-    const selectedOption = sel.options[sel.selectedIndex];
-    const contatoId = selectedOption?.dataset?.id || '';
-    const nome = selectedOption?.text?.split(' - Apt:')[0] || '';
-    const empresa = document.getElementById('registroEmpresa').value || '';
-    const obs = document.getElementById('registroObs').value || '';
-    const dataISO = new Date().toISOString();
-    const dataBR = new Date().toLocaleString('pt-BR');
-
-    // criar documento inicial
-    const docRef = await addDoc(collection(db, 'registros'), {
-      nome: nome,
-      apto: contatos.find(c=>c.id===contatoId)?.apto || '',
-      phone: numero,
-      empresa: empresa,
-      obs: obs,
-      data: dataISO,
-      dataBR: dataBR,
-      foto: '',
-      assinatura: '',
-      linkAssinatura: '',
-      dataBaixa: ''
-    });
-
-    // se o usuário selecionou arquivo pelo input
-    const inputFile = document.getElementById('registroFoto');
-    if(inputFile.files && inputFile.files[0]){
-      const file = inputFile.files[0];
-      // usa helper uploadFile
-      const url = await uploadFile(file, `registros/${docRef.id}/foto_${Date.now()}.png`);
-      await updateDoc(doc(db, 'registros', docRef.id), { foto: url });
-    }
-
-    // se capturou pela câmera
-    if(cameraCapturedFile){
-      const url = await uploadFile(cameraCapturedFile, `registros/${docRef.id}/foto_camera_${Date.now()}.png`);
-      await updateDoc(doc(db, 'registros', docRef.id), { foto: url });
-      cameraCapturedFile = null;
-    }
-
-    document.getElementById('msgResultado').innerText = 'Registro salvo!';
-    setTimeout(()=>{ document.getElementById('msgResultado').innerText = ''; }, 3000);
-
-    // limpar campos
-    document.getElementById('registroEmpresa').value=''; document.getElementById('registroObs').value=''; document.getElementById('registroFoto').value='';
-  });
-
-  // ------------------- RENDER REGISTROS -------------------
-  function renderRegistros(){
-    const lista = document.getElementById('listaRegistros');
-    lista.innerHTML = "";
-    registros.forEach((r,i)=>{
-      lista.innerHTML += `
-      <div class="registro-item">
-        <div class="registro-fotos">
-          ${r.foto ? `<img src="${r.foto}">` : `<div style="width:60px;height:70px;background:#ccc;border-radius:8px"></div>`}
-          ${r.assinatura ? `<img class="mini-assinatura" src="${r.assinatura}" title="Assinatura">` : `<div style="width:60px;height:70px"></div>`}
-        </div>
-        <div class="registro-content">
-          <strong>${r.nome} - Apt: ${r.apto}</strong><br>
-          ${r.empresa || ''}<br>
-          ${r.obs || ''}<br>
-          <small>Registro: ${r.dataBR || r.data}</small><br>
-          ${r.dataBaixa ? `<small>Baixa: ${r.dataBaixa}</small><br>` : ''}
-          ${r.assinatura ? `✅ Entrega Confirmada` : `<button class="small primary" onclick="darBaixa('${r.id}')">✍ Dar Baixa</button>`}
-          ${r.linkAssinatura ? `<div style="margin-top:6px"><a href="${r.linkAssinatura}" target="_blank">🔗 Link de assinatura</a></div>` : ''}
-        </div>
-        <button class="small danger" onclick="excluirRegistro('${r.id}')">🗑</button>
-      </div>`;
-    });
-  }
-
-  // ------------------- EXCLUIR REGISTRO -------------------
-  window.excluirRegistro = async (id) => {
-    const senha = prompt('Senha para excluir:');
-    if(senha !== SENHA_EXCLUIR) return alert('Senha incorreta');
-    await deleteDoc(doc(db, 'registros', id));
-  };
-
-  // ------------------- DAR BAIXA (ASSINATURA) -------------------
-  window.darBaixa = (registroId) => {
-    registroIndexAssinatura = registroId;
-    document.getElementById('assinaturaModal').style.display = 'flex';
-    document.getElementById('assinaturaModal').setAttribute('aria-hidden','false');
-    initCanvas();
-  };
-
-  // ------------------- ASSINATURA (CANVAS) - CORREÇÃO DEFINITIVA -------------------
-  const canvas = document.getElementById('assinaturaCanvasFull');
-  const ctx = canvas.getContext('2d');
-
-  function initCanvas(){
-    // Ajusta tamanho real do canvas (pixels) baseado no container exibido
-    const container = document.querySelector('.assinatura-canvas-container');
-    const rect = container.getBoundingClientRect();
-
-    // define dimensões do canvas em pixels (maior resolução para qualidade)
-    const width = Math.round(rect.width * devicePixelRatio);
-    const height = Math.round(rect.height * devicePixelRatio);
-
-    canvas.width = width;
-    canvas.height = height;
-
-    // ajustar CSS para manter aparência (o CSS já define 60% largura/altura)
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-
-    // escalas para coordenadas corretas
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#000';
-
-    let drawing = false;
-
-    function getPointerPos(e){
-      // suporta pointer events e touch/mouse
-      const r = canvas.getBoundingClientRect();
-      const clientX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0].clientX);
-      const clientY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0].clientY);
-      // converter para coordenadas no canvas levando em conta devicePixelRatio
-      const x = (clientX - r.left) * devicePixelRatio;
-      const y = (clientY - r.top) * devicePixelRatio;
-      return { x, y };
-    }
-
-    // pointer events (funciona em desktop e mobile modernos)
-    canvas.onpointerdown = (e) => {
-      drawing = true;
-      const p = getPointerPos(e);
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      e.preventDefault();
-    };
-    canvas.onpointermove = (e) => {
-      if(!drawing) return;
-      const p = getPointerPos(e);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-      e.preventDefault();
-    };
-    canvas.onpointerup = (e) => { drawing = false; e.preventDefault(); };
-    canvas.onpointercancel = () => drawing = false;
-    canvas.onpointerleave = () => drawing = false;
-  }
-
-  document.getElementById('assinaturaClear').onclick = () => {
-    // limpa em escala correta
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  };
-  document.getElementById('assinaturaClose').onclick = () => {
-    document.getElementById('assinaturaModal').style.display = 'none';
-    document.getElementById('assinaturaModal').setAttribute('aria-hidden','true');
-  };
-
-  // ------------------- SALVAR ASSINATURA e GERAR PDF -------------------
-  document.getElementById('assinaturaSave').onclick = async ()=> {
-    if(!registroIndexAssinatura) return alert('Registro inválido');
-
-    // converte canvas para blob em escala correta
-    canvas.toBlob(async (blob) => {
-      if(!blob) return alert('Assinatura vazia');
-
-      const fileName = `assinatura_${Date.now()}.png`;
-      const storageRef = sRef(storage, `registros/${registroIndexAssinatura}/${fileName}`);
-
-      try {
-        // Faz o upload da assinatura
-        await uploadBytes(storageRef, blob);
-
-        // Pega a URL pública
-        const url = await getDownloadURL(storageRef);
-
-        const dataBaixaBR = new Date().toLocaleString('pt-BR');
-
-        // Atualiza o documento no Firestore
-        await updateDoc(doc(db, 'registros', registroIndexAssinatura), {
-          assinatura: url,
-          linkAssinatura: url,
-          dataBaixa: dataBaixaBR
-        });
-
-        document.getElementById('assinaturaModal').style.display = 'none';
-        document.getElementById('assinaturaModal').setAttribute('aria-hidden','true');
-        alert('✅ Assinatura salva com sucesso!');
-
-        // Gera PDF (opcional) — já existia no seu fluxo; mantive chamado
-        gerarPDF(registroIndexAssinatura);
-
-      } catch (e) {
-        console.error("Erro ao salvar assinatura:", e);
-        alert("❌ Erro ao salvar assinatura. Veja o console.");
-      }
-    }, 'image/png');
-  };
-
-  // ------------------- FILTRAR CONTATOS -------------------
-  window.filtrarContatos = function(){
-    const f = document.getElementById('pesquisa').value.toLowerCase();
-    const sel = document.getElementById('contato');
-    Array.from(sel.options).forEach(o => {
-      if(!o.value) return;
-      o.style.display = o.text.toLowerCase().includes(f) ? 'block' : 'none';
-    });
-  };
-
-  // ------------------- CAMERA -------------------
-  const video = document.getElementById('cameraVideo');
-  const canvasCamera = document.getElementById('cameraCanvas');
-  document.getElementById('btnStartCamera').onclick = async () => {
-    if(cameraStream){ cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
-    video.classList.remove('hidden'); document.getElementById('btnCapturePhoto').classList.remove('hidden');
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    video.srcObject = cameraStream;
-  };
-  document.getElementById('btnCapturePhoto').onclick = () => {
-    canvasCamera.width = video.videoWidth;
-    canvasCamera.height = video.videoHeight;
-    canvasCamera.getContext('2d').drawImage(video, 0, 0);
-    canvasCamera.classList.remove('hidden'); video.classList.add('hidden');
-    cameraCapturedFile = dataURLtoFile(canvasCamera.toDataURL('image/png'), 'camera.png');
-    cameraStream.getTracks().forEach(t => t.stop());
-    cameraStream = null;
-    document.getElementById('btnCapturePhoto').classList.add('hidden');
-  };
-  function dataURLtoFile(dataurl, filename){
-    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--){ u8arr[n] = bstr.charCodeAt(n); }
-    return new File([u8arr], filename, { type: mime });
-  }
-
-  // ------------------- WHATSAPP -------------------
-  document.getElementById('btnEnviarWhatsApp').onclick = () => {
-    const sel = document.getElementById('contato');
-    const numero = sel.value.replace(/\D/g, '');
-    if(!numero) return alert("Selecione um morador.");
-    const nome = sel.options[sel.selectedIndex].text;
-    const empresa = document.getElementById('registroEmpresa').value || '(não informado)';
-    const obs = document.getElementById('registroObs').value || '(sem observação)';
-    const dataHora = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-
-    // pega último registro do mesmo telefone
-    const ultimo = registros.find(r => r && r.phone && r.phone.replace(/\D/g,'') === numero) || registros[0];
-    const id = ultimo?.id;
-    if(!id) return alert("Salve o registro antes de enviar o WhatsApp.");
-
-    const linkAssinatura = ultimo.linkAssinatura || `${SCRIPT_URL}?id=${id}`;
-    const mensagem = `📦 *Condomínio Cozumel* 🌴\n\nOlá, ${nome}!\nSua entrega chegou em ${dataHora}.\n📍 Empresa: ${empresa}\n📝 Observação: ${obs}\n\nPor favor, assine o recebimento aqui:\n${linkAssinatura}`;
-    const encodedMsg = encodeURIComponent(mensagem);
-    const linkApp = `whatsapp://send?phone=55${numero}&text=${encodedMsg}`;
-    const linkWeb = `https://wa.me/55${numero}?text=${encodedMsg}`;
-    // tenta abrir app, se não abrir, abre web
-    window.location.href = linkApp;
-    setTimeout(() => { window.open(linkWeb, '_blank'); }, 1500);
-  };
-
-  // ------------------- TABS -------------------
-  document.getElementById('tabEnviarBtn').onclick = () => { aba('abaEnviar') };
-  document.getElementById('tabRegistroBtn').onclick = () => { aba('abaRegistro'); renderRegistros(); };
-  document.getElementById('tabAdminBtn').onclick = () => { aba('abaAdmin') };
-  function aba(id){
-    document.getElementById('abaEnviar').classList.add('hidden');
-    document.getElementById('abaRegistro').classList.add('hidden');
-    document.getElementById('abaAdmin').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
-  }
-
-  // ------------------- GERAR PDF (jsPDF) -------------------
-  async function gerarPDF(id){
-    try {
-      const { jsPDF } = window.jspdf;
-      const snap = await getDoc(doc(db, "registros", id));
-      if(!snap.exists()) return;
-      const r = snap.data();
-
-      const pdf = new jsPDF({ unit:"pt", format:"a4" });
-      pdf.setFontSize(16);
-      pdf.text("COMPROVANTE DE ENTREGA - Condomínio Cozumel", 40, 50);
-
-      pdf.setFontSize(12);
-      pdf.text(`Morador: ${r.nome}`, 40, 90);
-      pdf.text(`Apartamento: ${r.apto}`, 40, 110);
-      pdf.text(`Empresa: ${r.empresa || '(não informado)'}`, 40, 130);
-      pdf.text(`Observação: ${r.obs || '(nenhuma)'}`, 40, 150);
-      pdf.text(`Data da baixa: ${r.dataBaixa || ''}`, 40, 170);
-
-      let y = 200;
-      // adiciona foto (se existir)
-      if(r.foto){
-        try {
-          const blobFoto = await fetch(r.foto).then(res => res.blob());
-          const bitmap = await createImageBitmap(blobFoto);
-          const canvasTemp = document.createElement('canvas');
-          canvasTemp.width = bitmap.width;
-          canvasTemp.height = bitmap.height;
-          const ctxTemp = canvasTemp.getContext('2d');
-          ctxTemp.drawImage(bitmap,0,0);
-          const dataUrl = canvasTemp.toDataURL('image/png');
-          pdf.addImage(dataUrl, 'PNG', 40, y, 180, 140);
-        } catch(e){ console.warn('Erro ao adicionar foto no PDF', e); }
-      }
-
-      // assinatura
-      if(r.assinatura){
-        try {
-          const blobSig = await fetch(r.assinatura).then(res => res.blob());
-          const bitmapSig = await createImageBitmap(blobSig);
-          const canvasSig = document.createElement('canvas');
-          canvasSig.width = bitmapSig.width;
-          canvasSig.height = bitmapSig.height;
-          const ctxSig = canvasSig.getContext('2d');
-          ctxSig.drawImage(bitmapSig,0,0);
-          const dataUrlSig = canvasSig.toDataURL('image/png');
-          pdf.addImage(dataUrlSig, 'PNG', 240, y, 180, 140);
-        } catch(e){ console.warn('Erro ao adicionar assinatura no PDF', e); }
-      }
-
-      // baixa o PDF
-      pdf.save(`Entrega_${r.nome.replace(/\s+/g,'_')}_Apto_${r.apto}.pdf`);
-    } catch(e){
-      console.error('Erro gerarPDF:', e);
-    }
-  }
-
-  // ------------------- UTILIDADES (carregamento inicial) -------------------
-  // preenche selects caso contatos não usem onSnapshot imediatamente
-  (function initialLoad(){
-    // já estamos sincronizando com onSnapshot acima; se quiser forçar um rebuild agora:
-    rebuildSelect();
-  })();
+window.excluirRegistro=async(id)=>{const s=prompt('Senha:');if(s!==SENHA_EXCLUIR)return alert('Senha incorreta');await deleteDoc(doc(db,'registros',id));};
 
 </script>
 </body>
