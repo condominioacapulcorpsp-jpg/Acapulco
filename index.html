@@ -4,10 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Correspondência - Condomínio Cozumel</title>
-
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 :root{
   --bg:#2c2f48;
@@ -30,7 +26,6 @@ body{background:var(--bg);color:#fff;}
 .card{background:var(--card);color:var(--text-dark);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-bottom:20px;}
 label{display:block;color:var(--muted);margin-top:10px;font-weight:bold;}
 input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;font-size:15px;}
-textarea{min-height:60px}
 button{cursor:pointer;transition:0.2s;}
 button:hover{opacity:0.9;}
 button.primary{background:var(--primary);color:#fff;padding:10px 14px;border-radius:8px;border:none;font-weight:bold;}
@@ -40,20 +35,13 @@ button.muted{background:#777;color:#fff;}
 .hidden{display:none;}
 .registro-item{display:flex;gap:12px;align-items:flex-start;background:#f9f9f9;border-radius:12px;padding:12px;color:#111;box-shadow:0 2px 6px rgba(0,0,0,0.1);margin-bottom:10px;}
 .registro-fotos{display:flex;gap:8px;flex-shrink:0;align-items:center;}
-.registro-fotos img,.registro-fotos canvas{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;background:#fff;}
-.registro-content{flex:1;display:flex;flex-direction:column;}
-.registro-content small{color:var(--muted);}
+.registro-fotos img{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;background:#fff;}
 footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
 .assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
 .assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
 canvas#assinaturaCanvasFull{background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;display:block;max-width:90vw;max-height:70vh;width:100%;height:auto;}
 .assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
 .assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
-video,canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
-.result-msg{margin-top:10px;font-weight:bold;}
-.admin-table{width:100%;border-collapse:collapse;margin-top:12px;background:transparent;color:var(--text-dark);}
-.admin-table th,.admin-table td{padding:8px;border-bottom:1px solid #eee;text-align:left}
-.mini-assinatura{width:60px;height:70px;object-fit:contain;border:1px solid #aaa;border-radius:6px;background:#fff;margin-left:6px;}
 </style>
 </head>
 <body>
@@ -64,36 +52,28 @@ video,canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
 </div>
 
 <div class="container">
-
   <div id="abaEnviar" class="card">
     <h3>💬 Enviar / Registrar Entrega</h3>
-    <label>Filtrar contato</label>
-    <input id="pesquisa" type="text" placeholder="Ex: nome ou número" oninput="filtrarContatos()">
     <label>Contato</label>
     <select id="contato"><option value="">-- Selecione --</option></select>
-
     <label>Empresa</label>
-    <input id="registroEmpresa" type="text" placeholder="Ex: Mercado Livre">
+    <input id="registroEmpresa" type="text">
     <label>Observação</label>
-    <input id="registroObs" type="text" placeholder="Ex: 2 pacotes">
-
-    <label>Foto da entrega (ou usar câmera)</label>
+    <input id="registroObs" type="text">
+    <label>Foto</label>
     <input id="registroFoto" type="file" accept="image/*">
-    <video id="cameraVideo" autoplay class="hidden"></video>
-    <canvas id="cameraCanvas" class="camera-canvas hidden"></canvas>
-
-    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-      <button id="btnStartCamera" class="small">📷 Usar Câmera</button>
-      <button id="btnCapturePhoto" class="small hidden">📸 Capturar</button>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       <button id="btnSalvarRegistro" class="small primary">💾 Salvar Registro</button>
-      <button id="btnEnviarWhatsApp" class="small" style="background:var(--active);color:#000;">📤 Enviar WhatsApp</button>
+      <button id="btnLimparFotoLocal" class="small danger">🧹 Limpar Foto Local</button>
     </div>
-    <div id="msgResultado" class="result-msg" aria-live="polite"></div>
   </div>
 
   <div id="abaRegistro" class="card hidden">
     <h3>📸 Registros de Entrega</h3>
-    <div id="listaRegistros"></div>
+    <div id="fotoLocalPreview"></div>
+    <div id="assinaturaLocalPreview"></div>
+    <button id="btnAssinar" class="small primary">✍️ Assinar</button>
+    <button id="btnLimparAssinaturaLocal" class="small danger">🧹 Limpar Assinatura Local</button>
   </div>
 
   <div id="abaAdmin" class="card hidden">
@@ -105,218 +85,96 @@ video,canvas.camera-canvas{width:60%;border-radius:8px;margin-top:8px;}
     <label>Telefone WhatsApp</label>
     <input id="novoTel" type="tel">
     <button id="btnAddMorador" class="primary">➕ Adicionar</button>
-    <table class="admin-table" id="adminTable"><thead><tr><th>Nome</th><th>Apto</th><th>Telefone</th><th>Ações</th></tr></thead><tbody></tbody></table>
   </div>
 </div>
 
-<div id="assinaturaModal" class="assinatura-fullscreen" aria-hidden="true">
+<div id="assinaturaModal" class="assinatura-fullscreen">
   <div class="assinatura-canvas-container">
     <canvas id="assinaturaCanvasFull"></canvas>
   </div>
   <div class="assinatura-buttons">
     <button id="assinaturaClear" class="danger">🧹 Limpar</button>
-    <button id="assinaturaSave" class="primary">✔ Salvar</button>
+    <button id="assinaturaSave" class="primary">💾 Salvar Local</button>
     <button id="assinaturaClose" class="muted">❌ Fechar</button>
   </div>
 </div>
 
 <footer>Condomínio Cozumel 🌴</footer>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCKnhbNKl2ggpdqiidjgBHa6XLDkNwIitA",
-  authDomain: "acapulco-5a508.firebaseapp.com",
-  projectId: "acapulco-5a508",
-  storageBucket: "acapulco-5a508.appspot.com",
-  messagingSenderId: "182598654317",
-  appId: "1:182598654317:web:2f3b796215fdf0854ce264"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLXNoYlENDq8AibSC308tDJHnbQqyU-0KkZDetuqa56ildHT5bp5XhFdov1vp43AMyfg/exec";
-const SENHA_EXCLUIR = '12345';
-
-let contatos = [], registros = [], registroIndexAssinatura = null, cameraCapturedFile = null;
-
-// ========== FIREBASE SNAPSHOTS ==========
-onSnapshot(collection(db, 'contatos'), snap => {
-  contatos = [];
-  snap.forEach(d => contatos.push({ id:d.id, ...d.data() }));
-  rebuildSelect();
-  renderAdminTable();
-});
-
-onSnapshot(query(collection(db,'registros'),orderBy('data','desc')), snap=>{
-  registros = [];
-  snap.forEach(d => registros.push({ id:d.id, ...d.data() }));
-  renderRegistros();
-});
-
-// ========== FUNÇÕES ==========
-function rebuildSelect(){
-  const sel=document.getElementById('contato');
-  sel.innerHTML='<option value="">-- Selecione --</option>';
-  contatos.forEach(c=>sel.innerHTML+=`<option value="${c.phone}" data-id="${c.id}">${c.name} - Apt: ${c.apto}</option>`);
-}
-
-function renderAdminTable(){
-  const tb=document.querySelector('#adminTable tbody');
-  tb.innerHTML='';
-  contatos.forEach(c=>{
-    tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.apto}</td><td>${c.phone}</td>
-    <td><button class="small" onclick="editarContato('${c.id}')">✏</button>
-    <button class="small danger" onclick="excluirContato('${c.id}')">🗑</button></td></tr>`;
-  });
-}
-
-window.editarContato=async(id)=>{const c=contatos.find(x=>x.id===id);if(!c)return;
-document.getElementById('novoNome').value=c.name;
-document.getElementById('novoApto').value=c.apto;
-document.getElementById('novoTel').value=c.phone;
-if(confirm('Salvar substitui contato atual. OK?'))await deleteDoc(doc(db,'contatos',id));};
-
-window.excluirContato=async(id)=>{const s=prompt('Senha:');if(s!==SENHA_EXCLUIR)return alert('Senha incorreta');await deleteDoc(doc(db,'contatos',id));};
-
-document.getElementById('btnAddMorador').onclick=async()=>{
-  const n=document.getElementById('novoNome').value.trim();
-  const a=document.getElementById('novoApto').value.trim();
-  const t=document.getElementById('novoTel').value.trim();
-  if(!n||!t)return alert('Preencha nome e telefone');
-  await addDoc(collection(db,'contatos'),{name:n,apto:a,phone:t});
-  document.getElementById('novoNome').value='';document.getElementById('novoApto').value='';document.getElementById('novoTel').value='';
-};
-
-async function uploadFile(file,path){const r=sRef(storage,path);await uploadBytes(r,file);return await getDownloadURL(r);}
-
-document.getElementById('btnSalvarRegistro').onclick=async()=>{
-  const sel=document.getElementById('contato');
-  const numero=sel.value.replace(/\D/g,'');if(!numero)return alert('Selecione morador');
-  const id=sel.options[sel.selectedIndex].dataset.id;
-  const nome=sel.options[sel.selectedIndex].text.split(' - Apt:')[0];
-  const empresa=document.getElementById('registroEmpresa').value||'';
-  const obs=document.getElementById('registroObs').value||'';
-  const now=new Date();
-  const ref=await addDoc(collection(db,'registros'),{nome,apto:contatos.find(c=>c.id===id)?.apto||'',phone:numero,empresa,obs,data:now.toISOString(),dataBR:now.toLocaleString('pt-BR'),foto:'',assinatura:'',linkAssinatura:'',dataBaixa:''});
-  const input=document.getElementById('registroFoto');
-  if(input.files[0]){const url=await uploadFile(input.files[0],`registros/${ref.id}/foto.png`);await updateDoc(doc(db,'registros',ref.id),{foto:url});}
-  if(cameraCapturedFile){const url=await uploadFile(cameraCapturedFile,`registros/${ref.id}/foto_camera.png`);await updateDoc(doc(db,'registros',ref.id),{foto:url});cameraCapturedFile=null;}
-  document.getElementById('msgResultado').innerText='Registro salvo!';
-  setTimeout(()=>document.getElementById('msgResultado').innerText='',3000);
-  document.getElementById('registroEmpresa').value='';document.getElementById('registroObs').value='';document.getElementById('registroFoto').value='';
-};
-
-function renderRegistros(){
-  const lista=document.getElementById('listaRegistros');
-  lista.innerHTML='';
-  registros.forEach(r=>{
-    lista.innerHTML+=`<div class="registro-item">
-    <div class="registro-fotos">
-      ${r.foto?`<img src="${r.foto}">`:`<div style="width:60px;height:70px;background:#ccc;border-radius:8px"></div>`}
-      ${r.assinatura?`<img class="mini-assinatura" src="${r.assinatura}">`:`<div style="width:60px;height:70px"></div>`}
-    </div>
-    <div class="registro-content"><strong>${r.nome} - Apt: ${r.apto}</strong><br>${r.empresa||''}<br>${r.obs||''}<br>
-    <small>${r.dataBR}</small><br>${r.dataBaixa?`<small>Baixa: ${r.dataBaixa}</small><br>`:''}
-    ${r.assinatura?`✅ Entrega Confirmada`:`<button class="small primary" onclick="darBaixa('${r.id}')">✍ Dar Baixa</button>`}</div>
-    <button class="small danger" onclick="excluirRegistro('${r.id}')">🗑</button></div>`;
-  });
-}
-
-// ===== ABAS =====
-const abaEnviar=document.getElementById('abaEnviar'),abaRegistro=document.getElementById('abaRegistro'),abaAdmin=document.getElementById('abaAdmin');
+<script>
+// ======== Abas ========
+const abaEnviar=document.getElementById('abaEnviar'),
+      abaRegistro=document.getElementById('abaRegistro'),
+      abaAdmin=document.getElementById('abaAdmin');
 document.getElementById('tabEnviarBtn').onclick=()=>{abaEnviar.classList.remove('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.add('hidden');};
 document.getElementById('tabRegistroBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.remove('hidden');abaAdmin.classList.add('hidden');};
 document.getElementById('tabAdminBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.remove('hidden');};
 
-function filtrarContatos(){
-  const f=document.getElementById('pesquisa').value.toLowerCase();
-  Array.from(document.getElementById('contato').options).forEach(o=>{o.style.display=o.text.toLowerCase().includes(f)?'':'none';});
+// ======== Foto local ========
+const fotoInput=document.getElementById('registroFoto');
+fotoInput.addEventListener('change',()=>{
+  const file=fotoInput.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    localStorage.setItem('fotoLocal',reader.result);
+    atualizarPreviewFoto();
+  };
+  reader.readAsDataURL(file);
+});
+function atualizarPreviewFoto(){
+  const dataURL=localStorage.getItem('fotoLocal');
+  const preview=document.getElementById('fotoLocalPreview');
+  preview.innerHTML=dataURL?`<img src="${dataURL}" style="width:80px;height:90px;border-radius:8px;border:1px solid #ccc;">`:"<p>Nenhuma foto local.</p>";
 }
+document.getElementById('btnLimparFotoLocal').onclick=()=>{localStorage.removeItem('fotoLocal');atualizarPreviewFoto();};
+window.addEventListener('load',atualizarPreviewFoto);
 
-// ===== CAMERA =====
-const video=document.getElementById('cameraVideo'),canvas=document.getElementById('cameraCanvas');
-document.getElementById('btnStartCamera').onclick=async()=>{
-  const s=await navigator.mediaDevices.getUserMedia({video:true});
-  video.srcObject=s;video.classList.remove('hidden');
-  document.getElementById('btnCapturePhoto').classList.remove('hidden');
-};
-document.getElementById('btnCapturePhoto').onclick=()=>{
-  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-  canvas.getContext('2d').drawImage(video,0,0);
-  canvas.toBlob(b=>{cameraCapturedFile=new File([b],'camera.png',{type:'image/png'});});
-  video.srcObject.getTracks().forEach(t=>t.stop());
-  video.classList.add('hidden');
-  document.getElementById('btnCapturePhoto').classList.add('hidden');
-};
-
-// ===== ASSINATURA =====
+// ======== Assinatura local ========
 const modal=document.getElementById('assinaturaModal');
-const c=document.getElementById('assinaturaCanvasFull');
-const ctx=c.getContext('2d');
+const canvas=document.getElementById('assinaturaCanvasFull');
+const ctx=canvas.getContext('2d');
 let desenhando=false;
 function resizeCanvas(){
-  c.width=c.clientWidth*2;
-  c.height=c.clientHeight*2;
+  canvas.width=canvas.clientWidth*2;
+  canvas.height=canvas.clientHeight*2;
   ctx.scale(2,2);
-  ctx.lineWidth=2;
-  ctx.lineCap='round';
+  ctx.lineWidth=2;ctx.lineCap='round';
 }
 resizeCanvas();
 window.addEventListener('resize',resizeCanvas);
 
-c.addEventListener('pointerdown',e=>{desenhando=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
-c.addEventListener('pointermove',e=>{if(desenhando){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
-c.addEventListener('pointerup',()=>desenhando=false);
-c.addEventListener('pointerleave',()=>desenhando=false);
+function desenhar(ev){
+  const rect=canvas.getBoundingClientRect();
+  const x=(ev.touches?ev.touches[0].clientX:ev.clientX)-rect.left;
+  const y=(ev.touches?ev.touches[0].clientY:ev.clientY)-rect.top;
+  if(!desenhando)return;
+  ctx.lineTo(x,y);
+  ctx.stroke();
+}
+canvas.addEventListener('mousedown',e=>{desenhando=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+canvas.addEventListener('mousemove',desenhar);
+canvas.addEventListener('mouseup',()=>desenhando=false);
+canvas.addEventListener('touchstart',e=>{desenhando=true;const t=e.touches[0];ctx.beginPath();ctx.moveTo(t.clientX-canvas.getBoundingClientRect().left,t.clientY-canvas.getBoundingClientRect().top);});
+canvas.addEventListener('touchmove',e=>{desenhar(e);e.preventDefault();});
+canvas.addEventListener('touchend',()=>desenhando=false);
 
-document.getElementById('assinaturaClear').onclick=()=>ctx.clearRect(0,0,c.width,c.height);
+document.getElementById('assinaturaClear').onclick=()=>ctx.clearRect(0,0,canvas.width,canvas.height);
 document.getElementById('assinaturaClose').onclick=()=>modal.style.display='none';
-
-window.darBaixa=(id)=>{
-  registroIndexAssinatura=id;
-  ctx.clearRect(0,0,c.width,c.height);
-  modal.style.display='flex';
-};
-
-document.getElementById('assinaturaSave').onclick=async()=>{
-  const assinaturaURL=c.toDataURL('image/png');
-  const regId=registroIndexAssinatura;
-  if(!regId)return;
-  const blob=await (await fetch(assinaturaURL)).blob();
-  const f=new File([blob],'assinatura.png',{type:'image/png'});
-  const url=await uploadFile(f,`registros/${regId}/assinatura.png`);
-  const now=new Date().toLocaleString('pt-BR');
-  await updateDoc(doc(db,'registros',regId),{assinatura:url,dataBaixa:now});
-
-  // Envia ao Google Sheets
-  const reg=registros.find(r=>r.id===regId);
-  fetch(SCRIPT_URL,{
-    method:'POST',
-    mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({nome:reg.nome,apartamento:reg.apto,protocolo:reg.id,assinatura:assinaturaURL})
-  });
-
+document.getElementById('assinaturaSave').onclick=()=>{
+  const dataURL=canvas.toDataURL('image/png');
+  localStorage.setItem('assinaturaLocal',dataURL);
+  atualizarPreviewAssinatura();
   modal.style.display='none';
 };
-
-// ===== WHATSAPP =====
-document.getElementById('btnEnviarWhatsApp').onclick=()=>{
-  const sel=document.getElementById('contato');
-  const numero=sel.value.replace(/\D/g,'');
-  if(!numero)return alert('Selecione morador');
-  const nome=sel.options[sel.selectedIndex].text.split(' - Apt:')[0];
-  const msg=`Olá ${nome}, chegou uma correspondência para você na portaria.`;
-  window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(msg)}`,'_blank');
-};
-
-window.excluirRegistro=async(id)=>{const s=prompt('Senha:');if(s!==SENHA_EXCLUIR)return alert('Senha incorreta');await deleteDoc(doc(db,'registros',id));};
-
+document.getElementById('btnAssinar').onclick=()=>{modal.style.display='flex';};
+document.getElementById('btnLimparAssinaturaLocal').onclick=()=>{localStorage.removeItem('assinaturaLocal');atualizarPreviewAssinatura();};
+function atualizarPreviewAssinatura(){
+  const dataURL=localStorage.getItem('assinaturaLocal');
+  const preview=document.getElementById('assinaturaLocalPreview');
+  preview.innerHTML=dataURL?`<img src="${dataURL}" style="width:80px;height:90px;border-radius:8px;border:1px solid #ccc;">`:"<p>Nenhuma assinatura local.</p>";
+}
+window.addEventListener('load',atualizarPreviewAssinatura);
 </script>
 </body>
 </html>
