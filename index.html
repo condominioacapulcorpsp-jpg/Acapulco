@@ -1,180 +1,343 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Correspondência - Condomínio Cozumel</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Correspondência - Portaria (Supabase)</title>
 <style>
-:root{
-  --bg:#2c2f48;
-  --nav:#1b2038;
-  --active:#1fb954;
-  --card:#fff;
-  --text-dark:#111;
-  --muted:#777;
-  --danger:#d9534f;
-  --primary:#1B284F;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
-body{background:var(--bg);color:#fff;}
-.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--nav);padding:12px 18px;color:#fff;flex-wrap:wrap;gap:8px;}
-.btn-top,.tab-link{border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;transition:0.2s;}
-.btn-top{background:var(--active);color:#000;}
-.tab-link{background:transparent;color:#fff;border:1px solid #fff;}
-.tab-link:hover,.btn-top:hover{opacity:0.9;}
-.container{max-width:700px;margin:20px auto;padding:16px;}
-.card{background:var(--card);color:var(--text-dark);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-bottom:20px;}
-label{display:block;color:var(--muted);margin-top:10px;font-weight:bold;}
-input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:6px;font-size:15px;}
-button{cursor:pointer;transition:0.2s;}
-button:hover{opacity:0.9;}
-button.primary{background:var(--primary);color:#fff;padding:10px 14px;border-radius:8px;border:none;font-weight:bold;}
-button.small{padding:8px 10px;border-radius:6px;border:none;}
-button.danger{background:var(--danger);color:#fff;}
-button.muted{background:#777;color:#fff;}
-.hidden{display:none;}
-.registro-item{display:flex;gap:12px;align-items:flex-start;background:#f9f9f9;border-radius:12px;padding:12px;color:#111;box-shadow:0 2px 6px rgba(0,0,0,0.1);margin-bottom:10px;}
-.registro-fotos{display:flex;gap:8px;flex-shrink:0;align-items:center;}
-.registro-fotos img{width:60px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #ddd;background:#fff;}
-footer{padding:12px;text-align:center;background:var(--nav);color:#fff;margin-top:20px;font-size:14px;}
-.assinatura-fullscreen{position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:10000;}
-.assinatura-canvas-container{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;}
-canvas#assinaturaCanvasFull{background:#fff;touch-action:none;border:1px solid #ccc;border-radius:8px;display:block;max-width:90vw;max-height:70vh;width:100%;height:auto;}
-.assinatura-buttons{display:flex;gap:12px;justify-content:center;padding:12px;background:#f0f0f0;}
-.assinatura-buttons button{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;}
+:root{--azul:#1f2b48;--verde:#1fb954;--fundo:#f0f2f5;--branco:#fff;--cinza:#ccc;--texto:#111;}
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 0; color: var(--texto); }
+nav { background: var(--azul); color: white; display: flex; justify-content: space-around; padding: 10px; }
+nav button { background: none; border: none; color: white; font-size: 16px; cursor: pointer; transition: 0.3s; }
+nav button:hover { color: var(--verde); }
+section { display: none; padding: 20px; }
+section.active { display: block; }
+h2 { margin-top: 0; color: var(--azul); }
+input, select, button { display: block; width: 100%; margin: 10px 0; padding: 10px; border-radius: 8px; border: 1px solid var(--cinza); font-size: 15px; }
+button { background: var(--azul); color: white; border: none; cursor: pointer; }
+button:hover { background: var(--verde); }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--branco); border-radius: 8px; overflow: hidden; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+th { background: var(--azul); color: white; }
+.signature-canvas { border: 2px dashed var(--azul); width: 100%; height: 150px; border-radius: 8px; }
+img.preview { width: 80px; height: 80px; object-fit: cover; margin: 5px; border: 1px solid #aaa; border-radius: 8px; }
+video { width: 100%; border-radius: 8px; }
+.pendente { background: #fff3cd; }
+.small { width: auto; display:inline-block; padding:6px 10px; margin:4px; font-size:14px; border-radius:6px; }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <button id="tabEnviarBtn" class="btn-top">💬 Enviar WhatsApp</button>
-  <button id="tabRegistroBtn" class="tab-link">📸 Registros</button>
-  <button id="tabAdminBtn" class="tab-link">👤 Admin Contatos</button>
-</div>
 
-<div class="container">
-  <div id="abaEnviar" class="card">
-    <h3>💬 Enviar / Registrar Entrega</h3>
-    <label>Contato</label>
-    <select id="contato"><option value="">-- Selecione --</option></select>
-    <label>Empresa</label>
-    <input id="registroEmpresa" type="text">
-    <label>Observação</label>
-    <input id="registroObs" type="text">
-    <label>Foto</label>
-    <input id="registroFoto" type="file" accept="image/*">
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button id="btnSalvarRegistro" class="small primary">💾 Salvar Registro</button>
-      <button id="btnLimparFotoLocal" class="small danger">🧹 Limpar Foto Local</button>
+<nav>
+  <button onclick="mostrarAba('registrar')">📦 Registrar</button>
+  <button onclick="mostrarAba('registros')">🗂 Registros</button>
+  <button onclick="mostrarAba('contatos')">👥 Contatos</button>
+</nav>
+
+<!-- Registrar -->
+<section id="registrar" class="active">
+  <h2>Registrar Correspondência</h2>
+
+  <input id="pesquisaContato" placeholder="🔍 Pesquisar contato..." oninput="filtrarContatos()" />
+  <select id="contatoSelect"></select>
+
+  <select id="descricao">
+    <option value="">Selecione o tipo de entrega</option>
+    <option value="Correios">Correios</option>
+    <option value="Mercado Livre">Mercado Livre</option>
+    <option value="Loggi">Loggi</option>
+    <option value="Outros">Outros</option>
+  </select>
+
+  <video id="video" autoplay playsinline style="display:none;"></video>
+  <button class="small" onclick="abrirCamera()">📷 Abrir Câmera</button>
+  <button id="capturarBtn" class="small" style="display:none;" onclick="capturarFoto()">📸 Capturar Imagem</button>
+  <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+  <div id="fotoPreview"></div>
+
+  <button onclick="registrarCorrespondencia()">💾 Salvar Registro</button>
+</section>
+
+<!-- Registros -->
+<section id="registros">
+  <h2>Registros de Correspondências</h2>
+  <table id="tabelaRegistros">
+    <thead>
+      <tr><th>Nome</th><th>Entrega</th><th>Foto</th><th>Assinatura</th><th>Data Registro</th><th>Baixa</th><th>Ações</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- Contatos -->
+<section id="contatos">
+  <h2>Contatos</h2>
+  <input id="nome" placeholder="Nome" />
+  <input id="telefone" placeholder="Telefone" />
+  <input id="apartamento" placeholder="Apartamento" />
+  <button onclick="salvarContato()">💾 Salvar Contato</button>
+  <table id="tabelaContatos">
+    <thead><tr><th>Nome</th><th>Telefone</th><th>Apartamento</th><th>Ações</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- Modal Assinatura -->
+<div id="modalAssinatura" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:1000;">
+  <div style="background:white;padding:20px;border-radius:8px;max-width:420px;width:92%;">
+    <h3>✍ Coletar Assinatura</h3>
+    <canvas id="assinaturaCanvas" class="signature-canvas"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="salvarAssinatura()">Salvar Assinatura</button>
+      <button onclick="limparAssinatura()">Limpar</button>
+      <button onclick="fecharModalAssinatura()">Cancelar</button>
     </div>
   </div>
-
-  <div id="abaRegistro" class="card hidden">
-    <h3>📸 Registros de Entrega</h3>
-    <div id="fotoLocalPreview"></div>
-    <div id="assinaturaLocalPreview"></div>
-    <button id="btnAssinar" class="small primary">✍️ Assinar</button>
-    <button id="btnLimparAssinaturaLocal" class="small danger">🧹 Limpar Assinatura Local</button>
-  </div>
-
-  <div id="abaAdmin" class="card hidden">
-    <h3>👤 Gerenciar Contatos</h3>
-    <label>Nome</label>
-    <input id="novoNome" type="text">
-    <label>Apartamento</label>
-    <input id="novoApto" type="text">
-    <label>Telefone WhatsApp</label>
-    <input id="novoTel" type="tel">
-    <button id="btnAddMorador" class="primary">➕ Adicionar</button>
-  </div>
 </div>
 
-<div id="assinaturaModal" class="assinatura-fullscreen">
-  <div class="assinatura-canvas-container">
-    <canvas id="assinaturaCanvasFull"></canvas>
-  </div>
-  <div class="assinatura-buttons">
-    <button id="assinaturaClear" class="danger">🧹 Limpar</button>
-    <button id="assinaturaSave" class="primary">💾 Salvar Local</button>
-    <button id="assinaturaClose" class="muted">❌ Fechar</button>
-  </div>
-</div>
-
-<footer>Condomínio Cozumel 🌴</footer>
-
+<!-- Supabase SDK e script -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ======== Abas ========
-const abaEnviar=document.getElementById('abaEnviar'),
-      abaRegistro=document.getElementById('abaRegistro'),
-      abaAdmin=document.getElementById('abaAdmin');
-document.getElementById('tabEnviarBtn').onclick=()=>{abaEnviar.classList.remove('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.add('hidden');};
-document.getElementById('tabRegistroBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.remove('hidden');abaAdmin.classList.add('hidden');};
-document.getElementById('tabAdminBtn').onclick=()=>{abaEnviar.classList.add('hidden');abaRegistro.classList.add('hidden');abaAdmin.classList.remove('hidden');};
+/* ================= CONFIGURAÇÃO SUPABASE ================= */
+const SUPABASE_URL = "https://vdxiphzxdpwggydezbzw.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkeGlwaHp4ZHB3Z2d5ZGV6Ynp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MDQxMTQsImV4cCI6MjA3ODQ4MDExNH0.IQLGlZlcgEw8-E_TbnfZwrzs8eJt0Ky4WtYrmyCr1aI";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ======== Foto local ========
-const fotoInput=document.getElementById('registroFoto');
-fotoInput.addEventListener('change',()=>{
-  const file=fotoInput.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    localStorage.setItem('fotoLocal',reader.result);
-    atualizarPreviewFoto();
-  };
-  reader.readAsDataURL(file);
-});
-function atualizarPreviewFoto(){
-  const dataURL=localStorage.getItem('fotoLocal');
-  const preview=document.getElementById('fotoLocalPreview');
-  preview.innerHTML=dataURL?`<img src="${dataURL}" style="width:80px;height:90px;border-radius:8px;border:1px solid #ccc;">`:"<p>Nenhuma foto local.</p>";
-}
-document.getElementById('btnLimparFotoLocal').onclick=()=>{localStorage.removeItem('fotoLocal');atualizarPreviewFoto();};
-window.addEventListener('load',atualizarPreviewFoto);
+/* ================= ESTADO LOCAL (mantém a interface) ================= */
+function mostrarAba(id){ document.querySelectorAll("section").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); }
 
-// ======== Assinatura local ========
-const modal=document.getElementById('assinaturaModal');
-const canvas=document.getElementById('assinaturaCanvasFull');
-const ctx=canvas.getContext('2d');
-let desenhando=false;
-function resizeCanvas(){
-  canvas.width=canvas.clientWidth*2;
-  canvas.height=canvas.clientHeight*2;
-  ctx.scale(2,2);
-  ctx.lineWidth=2;ctx.lineCap='round';
-}
-resizeCanvas();
-window.addEventListener('resize',resizeCanvas);
+let registros = [], contatos = [], registroIndexAssinatura = null, cameraStream = null, fotoTemporaria = null;
 
-function desenhar(ev){
-  const rect=canvas.getBoundingClientRect();
-  const x=(ev.touches?ev.touches[0].clientX:ev.clientX)-rect.left;
-  const y=(ev.touches?ev.touches[0].clientY:ev.clientY)-rect.top;
-  if(!desenhando)return;
-  ctx.lineTo(x,y);
-  ctx.stroke();
+/* ================= CONTATOS ================= */
+async function carregarContatos() {
+  const { data, error } = await supabase.from("contatos").select("*").order("nome");
+  if (error) { console.warn("Erro carregar contatos:", error); contatos = []; }
+  else contatos = data || [];
+  atualizarContatos();
 }
-canvas.addEventListener('mousedown',e=>{desenhando=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
-canvas.addEventListener('mousemove',desenhar);
-canvas.addEventListener('mouseup',()=>desenhando=false);
-canvas.addEventListener('touchstart',e=>{desenhando=true;const t=e.touches[0];ctx.beginPath();ctx.moveTo(t.clientX-canvas.getBoundingClientRect().left,t.clientY-canvas.getBoundingClientRect().top);});
-canvas.addEventListener('touchmove',e=>{desenhar(e);e.preventDefault();});
-canvas.addEventListener('touchend',()=>desenhando=false);
+function atualizarContatos() {
+  const tabela = document.querySelector("#tabelaContatos tbody");
+  const select = document.getElementById("contatoSelect");
+  tabela.innerHTML = "";
+  select.innerHTML = "<option value=''>Selecione um contato</option>";
+  contatos.forEach((c, i) => {
+    const row = tabela.insertRow();
+    row.insertCell(0).textContent = c.nome;
+    row.insertCell(1).textContent = c.telefone;
+    row.insertCell(2).textContent = c.apartamento;
+    row.insertCell(3).innerHTML = `<button onclick="editarContato(${i})">✏ Editar</button>
+                                  <button onclick="excluirContato(${c.id})">🗑 Excluir</button>`;
+    select.innerHTML += <option value="${i}">${c.nome} - ${c.apartamento}</option>;
+  });
+}
+async function salvarContato() {
+  const nome = document.getElementById("nome").value.trim();
+  const telefone = document.getElementById("telefone").value.trim();
+  const apartamento = document.getElementById("apartamento").value.trim();
+  if (!nome) return alert("Informe o nome!");
+  const { error } = await supabase.from("contatos").insert([{ nome, telefone, apartamento }]);
+  if (error) return alert("Erro ao salvar contato: " + error.message);
+  await carregarContatos();
+  document.getElementById("nome").value = document.getElementById("telefone").value = document.getElementById("apartamento").value = "";
+}
+async function editarContato(i) {
+  const c = contatos[i];
+  document.getElementById("nome").value = c.nome;
+  document.getElementById("telefone").value = c.telefone;
+  document.getElementById("apartamento").value = c.apartamento;
+  // Apaga o registro atual para que o salvar novo crie um novo com valores editados
+  await excluirContato(c.id);
+}
+async function excluirContato(id) {
+  const { error } = await supabase.from("contatos").delete().eq("id", id);
+  if (error) return alert("Erro ao excluir: " + error.message);
+  await carregarContatos();
+}
+function filtrarContatos() {
+  const termo = document.getElementById("pesquisaContato").value.toLowerCase();
+  const select = document.getElementById("contatoSelect");
+  select.innerHTML = "<option value=''>Selecione um contato</option>";
+  contatos.forEach((c, i) => {
+    if (c.nome.toLowerCase().includes(termo) || (c.apartamento || "").toLowerCase().includes(termo)) {
+      select.innerHTML += <option value="${i}">${c.nome} - ${c.apartamento}</option>;
+    }
+  });
+}
 
-document.getElementById('assinaturaClear').onclick=()=>ctx.clearRect(0,0,canvas.width,canvas.height);
-document.getElementById('assinaturaClose').onclick=()=>modal.style.display='none';
-document.getElementById('assinaturaSave').onclick=()=>{
-  const dataURL=canvas.toDataURL('image/png');
-  localStorage.setItem('assinaturaLocal',dataURL);
-  atualizarPreviewAssinatura();
-  modal.style.display='none';
-};
-document.getElementById('btnAssinar').onclick=()=>{modal.style.display='flex';};
-document.getElementById('btnLimparAssinaturaLocal').onclick=()=>{localStorage.removeItem('assinaturaLocal');atualizarPreviewAssinatura();};
-function atualizarPreviewAssinatura(){
-  const dataURL=localStorage.getItem('assinaturaLocal');
-  const preview=document.getElementById('assinaturaLocalPreview');
-  preview.innerHTML=dataURL?`<img src="${dataURL}" style="width:80px;height:90px;border-radius:8px;border:1px solid #ccc;">`:"<p>Nenhuma assinatura local.</p>";
+/* ================= CÂMERA ================= */
+function abrirCamera() {
+  const video = document.getElementById("video");
+  const capturarBtn = document.getElementById("capturarBtn");
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
+    .then(stream => { cameraStream = stream; video.srcObject = stream; video.style.display = "block"; capturarBtn.style.display = "block"; })
+    .catch(() => {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        cameraStream = stream; video.srcObject = stream; video.style.display = "block"; capturarBtn.style.display = "block";
+      }).catch(err => alert("Erro ao acessar câmera: " + err));
+    });
 }
-window.addEventListener('load',atualizarPreviewAssinatura);
+
+function capturarFoto() {
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  fotoTemporaria = canvas.toDataURL("image/png");
+  document.getElementById("fotoPreview").innerHTML = <img src="${fotoTemporaria}" class="preview">;
+  video.style.display = "none";
+  document.getElementById("capturarBtn").style.display = "none";
+  if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+}
+
+/* ================= UTIL: dataURL -> Blob ================= */
+function dataURLtoBlob(dataurl){
+  const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+  return new Blob([u8arr], { type: mime });
+}
+
+/* ================= UPLOAD PARA STORAGE (tenta, senão fallback para base64) ================= */
+async function uploadToStorage(bucket, fileName, blob){
+  try {
+    // tenta upload (usar upsert: true para substituir, se necessário)
+    const { error: uploadErr } = await supabase.storage.from(bucket).upload(fileName, blob, { upsert: true });
+    if (uploadErr) throw uploadErr;
+    // obter URL pública
+    const { data: publicData, error: urlErr } = supabase.storage.from(bucket).getPublicUrl(fileName);
+    if (urlErr) throw urlErr;
+    return publicData.publicUrl;
+  } catch (err) {
+    console.warn(Upload falhou para bucket ${bucket}:, err);
+    return null; // sinaliza que upload falhou (usar fallback)
+  }
+}
+
+/* ================= REGISTROS ================= */
+async function carregarRegistros() {
+  const { data, error } = await supabase.from("registros").select("*").order("id", { ascending: false });
+  if (error) { console.warn("Erro carregar registros:", error); registros = []; }
+  else registros = data || [];
+  atualizarTabela();
+}
+
+async function registrarCorrespondencia() {
+  const contatoIndex = document.getElementById("contatoSelect").value;
+  const entrega = document.getElementById("descricao").value;
+  if (contatoIndex === "" || entrega === "" || !fotoTemporaria) return alert("Selecione o morador, o tipo de entrega e capture uma foto!");
+  const contato = contatos[contatoIndex];
+  const dataHora = new Date().toLocaleString();
+
+  // 1) tenta fazer upload da foto para Storage
+  const blob = dataURLtoBlob(fotoTemporaria);
+  const fileName = fotos/${Date.now()}_${Math.floor(Math.random()*10000)}.png;
+  let fotoUrl = await uploadToStorage("fotos", fileName, blob);
+
+  // 2) se upload falhar, usa base64 como fallback
+  if (!fotoUrl) fotoUrl = fotoTemporaria;
+
+  const { error } = await supabase.from("registros").insert([{
+    nome: contato.nome,
+    entrega,
+    foto: fotoUrl,
+    assinatura: null,
+    data_hora: dataHora,
+    baixa: null
+  }]);
+
+  if (error) return alert("Erro ao registrar: " + error.message);
+  await carregarRegistros();
+  document.getElementById("contatoSelect").value = "";
+  document.getElementById("descricao").value = "";
+  document.getElementById("fotoPreview").innerHTML = "";
+  fotoTemporaria = null;
+}
+
+function atualizarTabela() {
+  const tbody = document.querySelector("#tabelaRegistros tbody");
+  tbody.innerHTML = "";
+  registros.forEach((r, i) => {
+    const row = tbody.insertRow();
+    if (!r.assinatura) row.classList.add("pendente");
+    row.insertCell(0).textContent = r.nome;
+    row.insertCell(1).textContent = r.entrega;
+    row.insertCell(2).innerHTML = r.foto ? <img src="${r.foto}" class="preview"> : "-";
+    row.insertCell(3).innerHTML = r.assinatura ? <img src="${r.assinatura}" class="preview"> : "❌ Pendente";
+    row.insertCell(4).textContent = r.data_hora || "-";
+    row.insertCell(5).textContent = r.baixa || "⏳ Aguardando";
+    row.insertCell(6).innerHTML = `
+      <button onclick="abrirAssinatura(${i})">✍ Dar Baixa</button>
+      <button onclick="compartilharWhatsApp(${i})">📲 WhatsApp</button>
+      <button onclick="excluirRegistro(${r.id})">🗑 Excluir</button>`;
+  });
+}
+
+async function excluirRegistro(id) {
+  const senha = prompt("Digite a senha para excluir:");
+  if (senha !== "12345") return alert("Senha incorreta!");
+  const { error } = await supabase.from("registros").delete().eq("id", id);
+  if (error) return alert("Erro ao excluir: " + error.message);
+  await carregarRegistros();
+}
+
+/* ================= WHATSAPP ================= */
+function compartilharWhatsApp(i) {
+  const r = registros[i];
+  const contato = contatos.find(c => c.nome === r.nome);
+  const telefone = contato ? contato.telefone.replace(/\D/g, '') : '';
+  const femininos = ["shoppe", "amazon", "shein", "loggi", "magalu", "americanas", "saraiva"];
+  const entregaLower = (r.entrega || "").trim().toLowerCase();
+  const artigo = femininos.some(f => entregaLower.includes(f)) ? "pela" : "pelo";
+  const msg = encodeURIComponent(
+    📦 *Olá, Chegou entrega para*\n${r.nome}\n🎁 Entregue ${artigo}: ${r.entrega}\n📅 dia: ${r.data_hora}\n✍ Baixa: ${r.baixa || 'Pendente atenciosamente, Portaria!'}
+  );
+  const urlApp = telefone ? whatsapp://send?phone=55${telefone}&text=${msg} : whatsapp://send?text=${msg};
+  const urlWeb = telefone ? https://wa.me/55${telefone}?text=${msg} : https://wa.me/?text=${msg};
+  // tenta abrir app; abre web em nova aba depois
+  window.location.href = urlApp;
+  setTimeout(() => window.open(urlWeb, "_blank"), 1500);
+}
+
+/* ================= ASSINATURA (modal + upload) ================= */
+const modal = document.getElementById("modalAssinatura");
+const canvasAss = document.getElementById("assinaturaCanvas");
+const ctxAss = canvasAss.getContext("2d");
+let desenhando = false;
+
+canvasAss.addEventListener("mousedown", e => { desenhando = true; ctxAss.beginPath(); ctxAss.moveTo(e.offsetX, e.offsetY); });
+canvasAss.addEventListener("mouseup", () => desenhando = false);
+canvasAss.addEventListener("mousemove", e => { if (!desenhando) return; ctxAss.lineTo(e.offsetX, e.offsetY); ctxAss.stroke(); });
+canvasAss.addEventListener("touchstart", e => { e.preventDefault(); desenhando = true; const t = e.touches[0]; ctxAss.beginPath(); ctxAss.moveTo(t.clientX - canvasAss.offsetLeft, t.clientY - canvasAss.offsetTop); });
+canvasAss.addEventListener("touchend", () => desenhando = false);
+canvasAss.addEventListener("touchmove", e => { if (!desenhando) return; e.preventDefault(); const t = e.touches[0]; ctxAss.lineTo(t.clientX - canvasAss.offsetLeft, t.clientY - canvasAss.offsetTop); ctxAss.stroke(); });
+
+function abrirAssinatura(i) {
+  registroIndexAssinatura = i;
+  ctxAss.clearRect(0, 0, canvasAss.width, canvasAss.height);
+  modal.style.display = "flex";
+}
+function fecharModalAssinatura() { modal.style.display = "none"; }
+function limparAssinatura() { ctxAss.clearRect(0, 0, canvasAss.width, canvasAss.height); }
+
+/* salvar assinatura: faz upload -> grava URL no registro; se falhar, salva base64 */
+async function salvarAssinatura() {
+  const dataURL = canvasAss.toDataURL("image/png");
+  const blob = dataURLtoBlob(dataURL);
+  const fileName = assinaturas/${Date.now()}_${Math.floor(Math.random()*10000)}.png;
+  let assinaturaUrl = await uploadToStorage("assinaturas", fileName, blob);
+  if (!assinaturaUrl) assinaturaUrl = dataURL; // fallback
+  const dataBaixa = new Date().toLocaleString();
+  const id = registros[registroIndexAssinatura].id;
+  const { error } = await supabase.from("registros").update({ assinatura: assinaturaUrl, baixa: dataBaixa }).eq("id", id);
+  if (error) return alert("Erro ao salvar assinatura: " + error.message);
+  modal.style.display = "none";
+  await carregarRegistros();
+}
+
+/* ================= INICIALIZAÇÃO ================= */
+carregarContatos();
+carregarRegistros();
 </script>
 </body>
 </html>
