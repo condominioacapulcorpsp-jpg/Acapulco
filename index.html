@@ -210,22 +210,27 @@ function atualizarContatos() {
     select.innerHTML += `<option value="${i}">${c.nome}</option>`;
   });
 }
+
 async function salvarContato() {
+  const nomeEl = document.getElementById('nome');
+  const telefoneEl = document.getElementById('telefone');
+  const apartamentoEl = document.getElementById('apartamento');
+  
   const nome = nomeEl.value.trim();
   const telefone = telefoneEl.value.trim();
   const apartamento = apartamentoEl.value.trim();
+  
   if (!nome) return alert("Informe o nome!");
+  
   const contato = { nome, telefone, apartamento };
   contatos.push(contato);
   localStorage.setItem("contatos", JSON.stringify(contatos));
   atualizarContatos();
   await db.from("contatos").upsert(contato);
 }
+
 function editarContato(i) { /* ... igual ao seu código anterior ... */ }
 function excluirContato(i) { /* ... igual ao seu código anterior ... */ }
-
-/* ===== OUTRAS FUNÇÕES (câmera, registros, assinatura etc.) ===== */
-// (mantêm tudo igual ao seu código anterior)
 
 window.addEventListener("online", sincronizarSupabase);
 atualizarContatos();
